@@ -36,7 +36,7 @@ LIBSECP256K1=secp256k1/libsecp256k1.la
 if ENABLE_ZMQ
 LIBBITCOIN_ZMQ=libbitcoin_zmq.a
 endif
-if BUILD_BITCOIN_LIBS
+if BUILD_DIAZ_LIBS
 LIBBITCOINCONSENSUS=libbitcoinconsensus.la
 endif
 if ENABLE_WALLET
@@ -616,7 +616,7 @@ bitcoin_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREAD
 #
 
 # bitcoinconsensus library #
-if BUILD_BITCOIN_LIBS
+if BUILD_DIAZ_LIBS
 include_HEADERS = script/diazconsensus.h
 libbitcoinconsensus_la_SOURCES = support/cleanse.cpp $(crypto_libbitcoin_crypto_base_a_SOURCES) $(libbitcoin_consensus_a_SOURCES)
 

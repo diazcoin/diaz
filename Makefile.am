@@ -11,7 +11,7 @@ endif
 
 export PYTHONPATH
 
-if BUILD_BITCOIN_LIBS
+if BUILD_DIAZ_LIBS
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libdiazconsensus.pc
 endif
