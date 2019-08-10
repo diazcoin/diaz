@@ -27,7 +27,7 @@ DIAZ_INCLUDES += $(UNIVALUE_CFLAGS)
 LIBDIAZ_SERVER=libbitcoin_server.a
 LIBDIAZ_COMMON=libbitcoin_common.a
 LIBDIAZ_CONSENSUS=libbitcoin_consensus.a
-LIBDIAZ_CLI=libbitcoin_cli.a
+LIBDIAZ_CLI=libdiaz_cli.a
 LIBDIAZ_UTIL=libbitcoin_util.a
 LIBDIAZ_CRYPTO_BASE=crypto/libbitcoin_crypto_base.a
 LIBDIAZQT=qt/libbitcoinqt.a
@@ -40,8 +40,8 @@ if BUILD_DIAZ_LIBS
 LIBDIAZCONSENSUS=libbitcoinconsensus.la
 endif
 if ENABLE_WALLET
-LIBDIAZ_WALLET=libbitcoin_wallet.a
-LIBDIAZ_WALLET_TOOL=libbitcoin_wallet_tool.a
+LIBDIAZ_WALLET=libdiaz_wallet.a
+LIBDIAZ_WALLET_TOOL=libdiaz_wallet_tool.a
 endif
 
 LIBDIAZ_CRYPTO= $(LIBDIAZ_CRYPTO_BASE)
@@ -322,9 +322,9 @@ endif
 
 # wallet: shared between diazd and diaz-qt, but only linked
 # when wallet enabled
-libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_wallet_a_SOURCES = \
+libdiaz_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
+libdiaz_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiaz_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \
@@ -342,9 +342,9 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/coinselection.cpp \
   $(DIAZ_CORE_H)
 
-libbitcoin_wallet_tool_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-libbitcoin_wallet_tool_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_wallet_tool_a_SOURCES = \
+libdiaz_wallet_tool_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
+libdiaz_wallet_tool_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiaz_wallet_tool_a_SOURCES = \
   wallet/wallettool.cpp \
   $(DIAZ_CORE_H)
 
@@ -510,9 +510,9 @@ AM_LDFLAGS += $(COMPAT_LDFLAGS)
 endif
 
 # cli: shared between diaz-cli and diaz-qt
-libbitcoin_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-libbitcoin_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_cli_a_SOURCES = \
+libdiaz_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
+libdiaz_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiaz_cli_a_SOURCES = \
   rpc/client.cpp \
   $(DIAZ_CORE_H)
 
@@ -549,35 +549,35 @@ diazd_LDADD = \
 diazd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
 # diaz-cli binary #
-bitcoin_cli_SOURCES = diaz-cli.cpp
-bitcoin_cli_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(EVENT_CFLAGS)
-bitcoin_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-bitcoin_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+diaz_cli_SOURCES = diaz-cli.cpp
+diaz_cli_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(EVENT_CFLAGS)
+diaz_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+diaz_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-bitcoin_cli_SOURCES += diaz-cli-res.rc
+diaz_cli_SOURCES += diaz-cli-res.rc
 endif
 
-bitcoin_cli_LDADD = \
+diaz_cli_LDADD = \
   $(LIBDIAZ_CLI) \
   $(LIBUNIVALUE) \
   $(LIBDIAZ_UTIL) \
   $(LIBDIAZ_CRYPTO)
 
-bitcoin_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+diaz_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # diaz-tx binary #
-bitcoin_tx_SOURCES = diaz-tx.cpp
-bitcoin_tx_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-bitcoin_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-bitcoin_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+diaz_tx_SOURCES = diaz-tx.cpp
+diaz_tx_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
+diaz_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+diaz_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-bitcoin_tx_SOURCES += diaz-tx-res.rc
+diaz_tx_SOURCES += diaz-tx-res.rc
 endif
 
-bitcoin_tx_LDADD = \
+diaz_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBDIAZ_COMMON) \
   $(LIBDIAZ_UTIL) \
@@ -585,20 +585,20 @@ bitcoin_tx_LDADD = \
   $(LIBDIAZ_CRYPTO) \
   $(LIBSECP256K1)
 
-bitcoin_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+diaz_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
 # diaz-wallet binary #
-bitcoin_wallet_SOURCES = diaz-wallet.cpp
-bitcoin_wallet_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-bitcoin_wallet_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-bitcoin_wallet_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+diaz_wallet_SOURCES = diaz-wallet.cpp
+diaz_wallet_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
+diaz_wallet_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+diaz_wallet_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-bitcoin_wallet_SOURCES += diaz-wallet-res.rc
+diaz_wallet_SOURCES += diaz-wallet-res.rc
 endif
 
-bitcoin_wallet_LDADD = \
+diaz_wallet_LDADD = \
   $(LIBDIAZ_WALLET_TOOL) \
   $(LIBDIAZ_WALLET) \
   $(LIBDIAZ_COMMON) \
@@ -612,7 +612,7 @@ bitcoin_wallet_LDADD = \
   $(LIBSECP256K1) \
   $(LIBUNIVALUE)
 
-bitcoin_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
+diaz_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
 #
 
 # bitcoinconsensus library #
