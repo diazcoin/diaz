@@ -102,7 +102,6 @@ protected:
     bool fDefaultConsistencyChecks;
     bool fRequireStandard;
     bool m_is_test_chain;
-bool startNewChain;
     CCheckpointData checkpointData;
     ChainTxData chainTxData;
 };
