@@ -24,20 +24,20 @@ DIAZ_INCLUDES=-I$(builddir) $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS
 DIAZ_INCLUDES += -I$(srcdir)/secp256k1/include
 DIAZ_INCLUDES += $(UNIVALUE_CFLAGS)
 
-LIBDIAZ_SERVER=libbitcoin_server.a
-LIBDIAZ_COMMON=libbitcoin_common.a
-LIBDIAZ_CONSENSUS=libbitcoin_consensus.a
+LIBDIAZ_SERVER=libdiaz_server.a
+LIBDIAZ_COMMON=libdiaz_common.a
+LIBDIAZ_CONSENSUS=libdiaz_consensus.a
 LIBDIAZ_CLI=libdiaz_cli.a
-LIBDIAZ_UTIL=libbitcoin_util.a
-LIBDIAZ_CRYPTO_BASE=crypto/libbitcoin_crypto_base.a
-LIBDIAZQT=qt/libbitcoinqt.a
+LIBDIAZ_UTIL=libdiaz_util.a
+LIBDIAZ_CRYPTO_BASE=crypto/libdiaz_crypto_base.a
+LIBDIAZQT=qt/libdiazqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
 
 if ENABLE_ZMQ
-LIBDIAZ_ZMQ=libbitcoin_zmq.a
+LIBDIAZ_ZMQ=libdiaz_zmq.a
 endif
 if BUILD_DIAZ_LIBS
-LIBDIAZCONSENSUS=libbitcoinconsensus.la
+LIBDIAZCONSENSUS=libdiazconsensus.la
 endif
 if ENABLE_WALLET
 LIBDIAZ_WALLET=libdiaz_wallet.a
@@ -46,15 +46,15 @@ endif
 
 LIBDIAZ_CRYPTO= $(LIBDIAZ_CRYPTO_BASE)
 if ENABLE_SSE41
-LIBDIAZ_CRYPTO_SSE41 = crypto/libbitcoin_crypto_sse41.a
+LIBDIAZ_CRYPTO_SSE41 = crypto/libdiaz_crypto_sse41.a
 LIBDIAZ_CRYPTO += $(LIBDIAZ_CRYPTO_SSE41)
 endif
 if ENABLE_AVX2
-LIBDIAZ_CRYPTO_AVX2 = crypto/libbitcoin_crypto_avx2.a
+LIBDIAZ_CRYPTO_AVX2 = crypto/libdiaz_crypto_avx2.a
 LIBDIAZ_CRYPTO += $(LIBDIAZ_CRYPTO_AVX2)
 endif
 if ENABLE_SHANI
-LIBDIAZ_CRYPTO_SHANI = crypto/libbitcoin_crypto_shani.a
+LIBDIAZ_CRYPTO_SHANI = crypto/libdiaz_crypto_shani.a
 LIBDIAZ_CRYPTO += $(LIBDIAZ_CRYPTO_SHANI)
 endif
 
@@ -98,7 +98,7 @@ endif
 endif
 
 .PHONY: FORCE check-symbols check-security
-# bitcoin core #
+# diaz core #
 DIAZ_CORE_H = \
   addrdb.h \
   addrman.h \
@@ -246,15 +246,15 @@ obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
 	@$(top_srcdir)/share/genbuild.sh "$(abs_top_builddir)/src/obj/build.h" \
 	  "$(abs_top_srcdir)"
-libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
+libdiaz_util_a-clientversion.$(OBJEXT): obj/build.h
 
 # server: shared between diazd and diaz-qt
 # Contains code accessing mempool and chain state that is meant to be separated
 # from wallet and gui code (see node/README.md). Shared code should go in
-# libbitcoin_common or libbitcoin_util libraries, instead.
-libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
-libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_server_a_SOURCES = \
+# libdiaz_common or libdiaz_util libraries, instead.
+libdiaz_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
+libdiaz_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiaz_server_a_SOURCES = \
   addrdb.cpp \
   addrman.cpp \
   banman.cpp \
@@ -303,16 +303,16 @@ libbitcoin_server_a_SOURCES = \
   $(DIAZ_CORE_H)
 
 if ENABLE_WALLET
-libbitcoin_server_a_SOURCES += wallet/init.cpp
+libdiaz_server_a_SOURCES += wallet/init.cpp
 endif
 if !ENABLE_WALLET
-libbitcoin_server_a_SOURCES += dummywallet.cpp
+libdiaz_server_a_SOURCES += dummywallet.cpp
 endif
 
 if ENABLE_ZMQ
-libbitcoin_zmq_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(ZMQ_CFLAGS)
-libbitcoin_zmq_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_zmq_a_SOURCES = \
+libdiaz_zmq_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(ZMQ_CFLAGS)
+libdiaz_zmq_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiaz_zmq_a_SOURCES = \
   zmq/zmqabstractnotifier.cpp \
   zmq/zmqnotificationinterface.cpp \
   zmq/zmqpublishnotifier.cpp \
@@ -349,9 +349,9 @@ libdiaz_wallet_tool_a_SOURCES = \
   $(DIAZ_CORE_H)
 
 # crypto primitives library
-crypto_libbitcoin_crypto_base_a_CPPFLAGS = $(AM_CPPFLAGS)
-crypto_libbitcoin_crypto_base_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libbitcoin_crypto_base_a_SOURCES = \
+crypto_libdiaz_crypto_base_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libdiaz_crypto_base_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libdiaz_crypto_base_a_SOURCES = \
   crypto/aes.cpp \
   crypto/aes.h \
   crypto/chacha_poly_aead.h \
@@ -379,31 +379,31 @@ crypto_libbitcoin_crypto_base_a_SOURCES = \
   crypto/siphash.h
 
 if USE_ASM
-crypto_libbitcoin_crypto_base_a_SOURCES += crypto/sha256_sse4.cpp
+crypto_libdiaz_crypto_base_a_SOURCES += crypto/sha256_sse4.cpp
 endif
 
-crypto_libbitcoin_crypto_sse41_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libbitcoin_crypto_sse41_a_CPPFLAGS = $(AM_CPPFLAGS)
-crypto_libbitcoin_crypto_sse41_a_CXXFLAGS += $(SSE41_CXXFLAGS)
-crypto_libbitcoin_crypto_sse41_a_CPPFLAGS += -DENABLE_SSE41
-crypto_libbitcoin_crypto_sse41_a_SOURCES = crypto/sha256_sse41.cpp
+crypto_libdiaz_crypto_sse41_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libdiaz_crypto_sse41_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libdiaz_crypto_sse41_a_CXXFLAGS += $(SSE41_CXXFLAGS)
+crypto_libdiaz_crypto_sse41_a_CPPFLAGS += -DENABLE_SSE41
+crypto_libdiaz_crypto_sse41_a_SOURCES = crypto/sha256_sse41.cpp
 
-crypto_libbitcoin_crypto_avx2_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libbitcoin_crypto_avx2_a_CPPFLAGS = $(AM_CPPFLAGS)
-crypto_libbitcoin_crypto_avx2_a_CXXFLAGS += $(AVX2_CXXFLAGS)
-crypto_libbitcoin_crypto_avx2_a_CPPFLAGS += -DENABLE_AVX2
-crypto_libbitcoin_crypto_avx2_a_SOURCES = crypto/sha256_avx2.cpp
+crypto_libdiaz_crypto_avx2_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libdiaz_crypto_avx2_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libdiaz_crypto_avx2_a_CXXFLAGS += $(AVX2_CXXFLAGS)
+crypto_libdiaz_crypto_avx2_a_CPPFLAGS += -DENABLE_AVX2
+crypto_libdiaz_crypto_avx2_a_SOURCES = crypto/sha256_avx2.cpp
 
-crypto_libbitcoin_crypto_shani_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libbitcoin_crypto_shani_a_CPPFLAGS = $(AM_CPPFLAGS)
-crypto_libbitcoin_crypto_shani_a_CXXFLAGS += $(SHANI_CXXFLAGS)
-crypto_libbitcoin_crypto_shani_a_CPPFLAGS += -DENABLE_SHANI
-crypto_libbitcoin_crypto_shani_a_SOURCES = crypto/sha256_shani.cpp
+crypto_libdiaz_crypto_shani_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libdiaz_crypto_shani_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libdiaz_crypto_shani_a_CXXFLAGS += $(SHANI_CXXFLAGS)
+crypto_libdiaz_crypto_shani_a_CPPFLAGS += -DENABLE_SHANI
+crypto_libdiaz_crypto_shani_a_SOURCES = crypto/sha256_shani.cpp
 
 # consensus: shared between all executables that validate any consensus rules.
-libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_consensus_a_SOURCES = \
+libdiaz_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
+libdiaz_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiaz_consensus_a_SOURCES = \
   amount.h \
   arith_uint256.cpp \
   arith_uint256.h \
@@ -421,7 +421,7 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/transaction.h \
   pubkey.cpp \
   pubkey.h \
-  script/bitcoinconsensus.cpp \
+  script/diazconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
   script/script.cpp \
@@ -438,9 +438,9 @@ libbitcoin_consensus_a_SOURCES = \
   version.h
 
 # common: shared between diazd, and diaz-qt and non-server tools
-libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_common_a_SOURCES = \
+libdiaz_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
+libdiaz_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiaz_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
   bloom.cpp \
@@ -473,9 +473,9 @@ libbitcoin_common_a_SOURCES = \
 # util: shared between all executables.
 # This library *must* be included to make sure that the glibc
 # backward-compatibility objects and their sanity checks are linked.
-libbitcoin_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-libbitcoin_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_util_a_SOURCES = \
+libdiaz_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
+libdiaz_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiaz_util_a_SOURCES = \
   support/lockedpool.cpp \
   chainparamsbase.cpp \
   clientversion.cpp \
@@ -505,7 +505,7 @@ libbitcoin_util_a_SOURCES = \
   $(DIAZ_CORE_H)
 
 if GLIBC_BACK_COMPAT
-libbitcoin_util_a_SOURCES += compat/glibc_compat.cpp
+libdiaz_util_a_SOURCES += compat/glibc_compat.cpp
 AM_LDFLAGS += $(COMPAT_LDFLAGS)
 endif
 
@@ -516,7 +516,7 @@ libdiaz_cli_a_SOURCES = \
   rpc/client.cpp \
   $(DIAZ_CORE_H)
 
-nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
+nodist_libdiaz_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
 # diazd binary #
@@ -615,19 +615,19 @@ diaz_wallet_LDADD = \
 diaz_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
 #
 
-# bitcoinconsensus library #
+# diazconsensus library #
 if BUILD_DIAZ_LIBS
 include_HEADERS = script/diazconsensus.h
-libbitcoinconsensus_la_SOURCES = support/cleanse.cpp $(crypto_libbitcoin_crypto_base_a_SOURCES) $(libbitcoin_consensus_a_SOURCES)
+libdiazconsensus_la_SOURCES = support/cleanse.cpp $(crypto_libdiaz_crypto_base_a_SOURCES) $(libdiaz_consensus_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
-  libbitcoinconsensus_la_SOURCES += compat/glibc_compat.cpp
+  libdiazconsensus_la_SOURCES += compat/glibc_compat.cpp
 endif
 
-libbitcoinconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
-libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1)
-libbitcoinconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_DIAZ_INTERNAL
-libbitcoinconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libdiazconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
+libdiazconsensus_la_LIBADD = $(LIBSECP256K1)
+libdiazconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_DIAZ_INTERNAL
+libdiazconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
 endif
 #
