@@ -2,14 +2,14 @@
 
 *.exe
 *.pdb
-src/bitcoin
-src/bitcoind
-src/bitcoin-cli
-src/bitcoin-tx
-src/bitcoin-wallet
-src/test/test_bitcoin
-src/test/test_bitcoin_fuzzy
-src/qt/test/test_bitcoin-qt
+src/diaz
+src/diazd
+src/diaz-cli
+src/diaz-tx
+src/diaz-wallet
+src/test/test_diaz
+src/test/test_diaz_fuzzy
+src/qt/test/test_diaz-qt
 
 # autoreconf
 Makefile.in
@@ -32,8 +32,8 @@ config.log
 config.status
 configure
 libtool
-src/config/bitcoin-config.h
-src/config/bitcoin-config.h.in
+src/config/diaz-config.h
+src/config/diaz-config.h.in
 src/config/stamp-h1
 share/setup.nsi
 share/qt/Info.plist
@@ -46,11 +46,11 @@ src/qt/forms/ui_*.h
 
 src/qt/test/moc*.cpp
 
-src/qt/bitcoin-qt.config
-src/qt/bitcoin-qt.creator
-src/qt/bitcoin-qt.creator.user
-src/qt/bitcoin-qt.files
-src/qt/bitcoin-qt.includes
+src/qt/diaz-qt.config
+src/qt/diaz-qt.creator
+src/qt/diaz-qt.creator.user
+src/qt/diaz-qt.files
+src/qt/diaz-qt.includes
 
 .deps
 .dirstamp
@@ -87,8 +87,8 @@ src/qt/bitcoin-qt.includes
 *.qm
 Makefile
 !depends/Makefile
-bitcoin-qt
-Bitcoin-Qt.app
+diaz-qt
+Diaz-Qt.app
 background.tiff*
 
 # Qt Creator
@@ -96,7 +96,7 @@ Makefile.am.user
 
 # Unit-tests
 Makefile.test
-bitcoin-qt_test
+diaz-qt_test
 
 # Resources cpp
 qrc_*.cpp
@@ -109,7 +109,7 @@ build
 *.gcno
 *.gcda
 /*.info
-test_bitcoin.coverage/
+test_diaz.coverage/
 total.coverage/
 coverage_percent.txt
 
@@ -124,7 +124,7 @@ test/cache/*
 
 /doc/doxygen/
 
-libbitcoinconsensus.pc
+libdiazconsensus.pc
 contrib/devtools/split-debug.sh
 
 # Output from running db4 installation
