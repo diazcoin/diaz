@@ -1,6 +1,6 @@
 dist_man1_MANS=
 
-if BUILD_BITCOIND
+if BUILD_DIAZD
   dist_man1_MANS+=diazd.1
 endif
 

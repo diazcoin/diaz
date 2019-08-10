@@ -263,7 +263,7 @@ def main():
 
     logging.debug("Temporary test directory at %s" % tmpdir)
 
-    enable_diazd = config["components"].getboolean("ENABLE_BITCOIND")
+    enable_diazd = config["components"].getboolean("ENABLE_DIAZD")
 
     if not enable_diazd:
         print("No functional tests to run.")

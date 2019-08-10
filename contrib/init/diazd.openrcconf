@@ -1,33 +1,33 @@
 # /etc/conf.d/diazd: config file for /etc/init.d/diazd
 
 # Config file location
-#BITCOIND_CONFIGFILE="/etc/bitcoin/diaz.conf"
+#DIAZD_CONFIGFILE="/etc/bitcoin/diaz.conf"
 
-# What directory to write pidfile to?  (created and owned by $BITCOIND_USER)
-#BITCOIND_PIDDIR="/var/run/diazd"
+# What directory to write pidfile to?  (created and owned by $DIAZD_USER)
+#DIAZD_PIDDIR="/var/run/diazd"
 
 # What filename to give the pidfile
-#BITCOIND_PIDFILE="${BITCOIND_PIDDIR}/diazd.pid"
+#DIAZD_PIDFILE="${DIAZD_PIDDIR}/diazd.pid"
 
 # Where to write diazd data (be mindful that the blockchain is large)
-#BITCOIND_DATADIR="/var/lib/diazd"
+#DIAZD_DATADIR="/var/lib/diazd"
 
 # User and group to own diazd process
-#BITCOIND_USER="bitcoin"
-#BITCOIND_GROUP="bitcoin"
+#DIAZD_USER="bitcoin"
+#DIAZD_GROUP="bitcoin"
 
 # Path to diazd executable
-#BITCOIND_BIN="/usr/bin/diazd"
+#DIAZD_BIN="/usr/bin/diazd"
 
 # Nice value to run diazd under
-#BITCOIND_NICE=0
+#DIAZD_NICE=0
 
 # Additional options (avoid -conf and -datadir, use flags above)
-#BITCOIND_OPTS=""
+#DIAZD_OPTS=""
 
 # The timeout in seconds OpenRC will wait for diazd to terminate
 # after a SIGTERM has been raised.
 # Note that this will be mapped as argument to start-stop-daemon's
 # '--retry' option, which means you can specify a retry schedule
 # here. For more information see man 8 start-stop-daemon.
-BITCOIND_SIGTERM_TIMEOUT=60
+DIAZD_SIGTERM_TIMEOUT=60

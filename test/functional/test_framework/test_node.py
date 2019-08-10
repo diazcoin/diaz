@@ -32,7 +32,7 @@ from .util import (
     p2p_port,
 )
 
-BITCOIND_PROC_WAIT_TIMEOUT = 60
+DIAZD_PROC_WAIT_TIMEOUT = 60
 
 
 class FailedToStartError(Exception):
@@ -302,7 +302,7 @@ class TestNode():
         self.log.debug("Node stopped")
         return True
 
-    def wait_until_stopped(self, timeout=BITCOIND_PROC_WAIT_TIMEOUT):
+    def wait_until_stopped(self, timeout=DIAZD_PROC_WAIT_TIMEOUT):
         wait_until(self.is_node_stopped, timeout=timeout)
 
     @contextlib.contextmanager

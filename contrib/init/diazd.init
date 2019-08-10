@@ -19,14 +19,14 @@ fi
 RETVAL=0
 
 prog=diazd
-# you can override the lockfile via BITCOIND_LOCKFILE in /etc/sysconfig/diazd
-lockfile=${BITCOIND_LOCKFILE-/var/lock/subsys/diazd}
+# you can override the lockfile via DIAZD_LOCKFILE in /etc/sysconfig/diazd
+lockfile=${DIAZD_LOCKFILE-/var/lock/subsys/diazd}
 
-# diazd defaults to /usr/bin/diazd, override with BITCOIND_BIN
-diazd=${BITCOIND_BIN-/usr/bin/diazd}
+# diazd defaults to /usr/bin/diazd, override with DIAZD_BIN
+diazd=${DIAZD_BIN-/usr/bin/diazd}
 
-# diazd opts default to -disablewallet, override with BITCOIND_OPTS
-diazd_opts=${BITCOIND_OPTS--disablewallet}
+# diazd opts default to -disablewallet, override with DIAZD_OPTS
+diazd_opts=${DIAZD_OPTS--disablewallet}
 
 start() {
     echo -n $"Starting $prog: "
