@@ -145,7 +145,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         config.read_file(open(self.options.configfile))
         self.config = config
         self.options.diazd = os.getenv("DIAZD", default=config["environment"]["BUILDDIR"] + '/src/diazd' + config["environment"]["EXEEXT"])
-        self.options.bitcoincli = os.getenv("BITCOINCLI", default=config["environment"]["BUILDDIR"] + '/src/diaz-cli' + config["environment"]["EXEEXT"])
+        self.options.bitcoincli = os.getenv("DIAZCLI", default=config["environment"]["BUILDDIR"] + '/src/diaz-cli' + config["environment"]["EXEEXT"])
 
         os.environ['PATH'] = os.pathsep.join([
             os.path.join(config['environment']['BUILDDIR'], 'src'),

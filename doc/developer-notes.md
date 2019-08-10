@@ -737,13 +737,13 @@ namespace {
     the location of the source file actually is relevant.
 
 - Use include guards to avoid the problem of double inclusion. The header file
-  `foo/bar.h` should use the include guard identifier `BITCOIN_FOO_BAR_H`, e.g.
+  `foo/bar.h` should use the include guard identifier `DIAZ_FOO_BAR_H`, e.g.
 
 ```c++
-#ifndef BITCOIN_FOO_BAR_H
-#define BITCOIN_FOO_BAR_H
+#ifndef DIAZ_FOO_BAR_H
+#define DIAZ_FOO_BAR_H
 ...
-#endif // BITCOIN_FOO_BAR_H
+#endif // DIAZ_FOO_BAR_H
 ```
 
 GUI
