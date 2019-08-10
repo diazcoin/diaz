@@ -14,7 +14,7 @@
     <ClCompile Include="..\..\src\bench\base58.cpp" />
     <ClCompile Include="..\..\src\bench\bech32.cpp" />
     <ClCompile Include="..\..\src\bench\bench.cpp" />
-    <ClCompile Include="..\..\src\bench\bench_bitcoin.cpp" />
+    <ClCompile Include="..\..\src\bench\bench_diaz.cpp" />
     <ClCompile Include="..\..\src\bench\ccoins_caching.cpp" />
     <ClCompile Include="..\..\src\bench\checkblock.cpp" />
     <ClCompile Include="..\..\src\bench\checkqueue.cpp" />

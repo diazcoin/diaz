@@ -96,7 +96,7 @@ Alice, Bob, and Carol want to create a 2-of-3 multisig address. They're all usin
 Bitcoin Core. We assume their wallets only contain the multisig funds. In case
 they also have a personal wallet, this can be accomplished through the
 multiwallet feature - possibly resulting in a need to add `-rpcwallet=name` to
-the command line in case `bitcoin-cli` is used.
+the command line in case `diaz-cli` is used.
 
 Setup:
 - All three call `getnewaddress` to create a new address; call these addresses
@@ -118,7 +118,7 @@ Setup:
   initiate transactions later, however.
 - They can now give out *Amulti* as address others can pay to.
 
-Later, when *V* BTC has been received on *Amulti*, and Bob and Carol want to
+Later, when *V* DIAZ has been received on *Amulti*, and Bob and Carol want to
 move the coins in their entirety to address *Asend*, with no change. Alice
 does not need to be involved.
 - One of them - let's assume Carol here - initiates the creation. She runs

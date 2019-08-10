@@ -33,7 +33,7 @@
 //
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#include <config/diaz-config.h>
 #endif
 
 #ifdef ENABLE_BIP70

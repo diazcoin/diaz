@@ -16,7 +16,7 @@ The following are some helpful notes on how to run Bitcoin Core on your native p
 Unpack the files into a directory and run:
 
 - `bin/bitcoin-qt` (GUI) or
-- `bin/bitcoind` (headless)
+- `bin/diazd` (headless)
 
 ### Windows
 
@@ -71,7 +71,7 @@ The Bitcoin repo's [root README](/README.md) contains relevant information on th
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)
-- [bitcoin.conf Configuration File](bitcoin-conf.md)
+- [diaz.conf Configuration File](diaz.conf.md)
 - [Files](files.md)
 - [Fuzz-testing](fuzzing.md)
 - [Reduce Memory](reduce-memory.md)

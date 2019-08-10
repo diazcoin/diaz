@@ -6,8 +6,8 @@
 
 #include <chainparams.h>
 #include <key.h>
-#include <qt/bitcoin.h>
-#include <qt/bitcoingui.h>
+#include <qt/diaz.h>
+#include <qt/diazgui.h>
 #include <qt/networkstyle.h>
 #include <qt/rpcconsole.h>
 #include <shutdown.h>
@@ -16,7 +16,7 @@
 #include <validation.h>
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#include <config/diaz-config.h>
 #endif
 
 #include <QAction>
