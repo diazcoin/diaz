@@ -43,7 +43,7 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
-TMPDIR_PREFIX = "bitcoin_func_test_"
+TMPDIR_PREFIX = "diaz_func_test_"
 
 
 class SkipTest(Exception):
@@ -74,9 +74,9 @@ class BitcoinTestMetaClass(type):
 
 
 class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
-    """Base class for a bitcoin test script.
+    """Base class for a diaz test script.
 
-    Individual bitcoin test scripts should subclass this class and override the set_test_params() and run_test() methods.
+    Individual diaz test scripts should subclass this class and override the set_test_params() and run_test() methods.
 
     Individual tests can also override the following methods to customize the test setup:
 
@@ -145,7 +145,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         config.read_file(open(self.options.configfile))
         self.config = config
         self.options.diazd = os.getenv("DIAZD", default=config["environment"]["BUILDDIR"] + '/src/diazd' + config["environment"]["EXEEXT"])
-        self.options.bitcoincli = os.getenv("DIAZCLI", default=config["environment"]["BUILDDIR"] + '/src/diaz-cli' + config["environment"]["EXEEXT"])
+        self.options.diazcli = os.getenv("DIAZCLI", default=config["environment"]["BUILDDIR"] + '/src/diaz-cli' + config["environment"]["EXEEXT"])
 
         os.environ['PATH'] = os.pathsep.join([
             os.path.join(config['environment']['BUILDDIR'], 'src'),
@@ -347,7 +347,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
                 rpchost=rpchost,
                 timewait=self.rpc_timeout,
                 diazd=binary[i],
-                bitcoin_cli=self.options.bitcoincli,
+                diaz_cli=self.options.diazcli,
                 coverage_dir=self.options.coveragedir,
                 cwd=self.options.tmpdir,
                 extra_conf=extra_confs[i],
@@ -490,7 +490,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
                     rpchost=None,
                     timewait=self.rpc_timeout,
                     diazd=self.options.diazd,
-                    bitcoin_cli=self.options.bitcoincli,
+                    diaz_cli=self.options.diazcli,
                     coverage_dir=None,
                     cwd=self.options.tmpdir,
                 ))

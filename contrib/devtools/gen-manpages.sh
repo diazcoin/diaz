@@ -11,7 +11,7 @@ DIAZD=${DIAZD:-$BINDIR/diazd}
 DIAZCLI=${DIAZCLI:-$BINDIR/diaz-cli}
 DIAZTX=${DIAZTX:-$BINDIR/diaz-tx}
 WALLET_TOOL=${WALLET_TOOL:-$BINDIR/diaz-wallet}
-DIAZQT=${DIAZQT:-$BINDIR/qt/bitcoin-qt}
+DIAZQT=${DIAZQT:-$BINDIR/qt/diaz-qt}
 
 [ ! -x $DIAZD ] && echo "$DIAZD not found or not executable." && exit 1
 
@@ -20,7 +20,7 @@ read -r -a DIAZVER <<< "$($DIAZCLI --version | head -n1 | awk -F'[ -]' '{ print 
 
 # Create a footer file with copyright content.
 # This gets autodetected fine for diazd if --version-string is not set,
-# but has different outcomes for bitcoin-qt and diaz-cli.
+# but has different outcomes for diaz-qt and diaz-cli.
 echo "[COPYRIGHT]" > footer.h2m
 $DIAZD --version | sed -n '1!p' >> footer.h2m
 

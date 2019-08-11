@@ -112,7 +112,7 @@ BASE_SCRIPTS = [
     'wallet_keypool_topup.py',
     'feature_fee_estimation.py',
     'interface_zmq.py',
-    'interface_bitcoin_cli.py',
+    'interface_diaz_cli.py',
     'mempool_resurrect.py',
     'wallet_txn_doublespend.py --mineblock',
     'tool_wallet.py',

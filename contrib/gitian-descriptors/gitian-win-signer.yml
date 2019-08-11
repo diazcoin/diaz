@@ -1,5 +1,5 @@
 ---
-name: "bitcoin-win-signer"
+name: "diaz-win-signer"
 distro: "ubuntu"
 suites:
 - "bionic"

@@ -2,18 +2,18 @@
 
 # backward compatibility for existing gentoo layout 
 #
-if [ -d "/var/lib/bitcoin/.bitcoin" ]; then
-	DIAZD_DEFAULT_DATADIR="/var/lib/bitcoin/.bitcoin"
+if [ -d "/var/lib/diaz/.diaz" ]; then
+	DIAZD_DEFAULT_DATADIR="/var/lib/diaz/.diaz"
 else
 	DIAZD_DEFAULT_DATADIR="/var/lib/diazd"
 fi
 
-DIAZD_CONFIGFILE=${DIAZD_CONFIGFILE:-/etc/bitcoin/diaz.conf}
+DIAZD_CONFIGFILE=${DIAZD_CONFIGFILE:-/etc/diaz/diaz.conf}
 DIAZD_PIDDIR=${DIAZD_PIDDIR:-/var/run/diazd}
 DIAZD_PIDFILE=${DIAZD_PIDFILE:-${DIAZD_PIDDIR}/diazd.pid}
 DIAZD_DATADIR=${DIAZD_DATADIR:-${DIAZD_DEFAULT_DATADIR}}
-DIAZD_USER=${DIAZD_USER:-${DIAZ_USER:-bitcoin}}
-DIAZD_GROUP=${DIAZD_GROUP:-bitcoin}
+DIAZD_USER=${DIAZD_USER:-${DIAZ_USER:-diaz}}
+DIAZD_GROUP=${DIAZD_GROUP:-diaz}
 DIAZD_BIN=${DIAZD_BIN:-/usr/bin/diazd}
 DIAZD_NICE=${DIAZD_NICE:-${NICELEVEL:-0}}
 DIAZD_OPTS="${DIAZD_OPTS:-${DIAZ_OPTS}}"
