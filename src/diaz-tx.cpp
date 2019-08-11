@@ -36,7 +36,7 @@ static const int CONTINUE_EXECUTION=-1;
 
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
-static void SetupBitcoinTxArgs()
+static void SetupDiazTxArgs()
 {
     SetupHelpOptions(gArgs);
 
@@ -81,7 +81,7 @@ static int AppInitRawTx(int argc, char* argv[])
     //
     // Parameters
     //
-    SetupBitcoinTxArgs();
+    SetupDiazTxArgs();
     std::string error;
     if (!gArgs.ParseParameters(argc, argv, error)) {
         tfm::format(std::cerr, "Error parsing command line arguments: %s\n", error.c_str());
@@ -101,8 +101,8 @@ static int AppInitRawTx(int argc, char* argv[])
     if (argc < 2 || HelpRequested(gArgs)) {
         // First part of help message is specific to this utility
         std::string strUsage = PACKAGE_NAME " diaz-tx utility version " + FormatFullVersion() + "\n\n" +
-            "Usage:  diaz-tx [options] <hex-tx> [commands]  Update hex-encoded bitcoin transaction\n" +
-            "or:     diaz-tx [options] -create [commands]   Create hex-encoded bitcoin transaction\n" +
+            "Usage:  diaz-tx [options] <hex-tx> [commands]  Update hex-encoded diaz transaction\n" +
+            "or:     diaz-tx [options] -create [commands]   Create hex-encoded diaz transaction\n" +
             "\n";
         strUsage += gArgs.GetHelpMessage();
 
@@ -792,7 +792,7 @@ static int CommandLineRawTx(int argc, char* argv[])
             if (argc < 2)
                 throw std::runtime_error("too few parameters");
 
-            // param: hex-encoded bitcoin transaction
+            // param: hex-encoded diaz transaction
             std::string strHexTx(argv[1]);
             if (strHexTx == "-")                 // "-" implies standard input
                 strHexTx = readStdin();
