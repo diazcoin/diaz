@@ -48,7 +48,7 @@
     <name>BanTableModel</name>
     </context>
 <context>
-    <name>BitcoinGUI</name>
+    <name>DiazGUI</name>
     <message>
         <source>&amp;Transactions</source>
         <translation>&amp;Транзакциялар</translation>
@@ -70,7 +70,7 @@
         <translation>Құпия сөзді өзгерту</translation>
     </message>
     <message>
-        <source>Bitcoin</source>
+        <source>Diaz</source>
         <translation>Биткоин</translation>
     </message>
     <message>
@@ -169,7 +169,7 @@
 <context>
     <name>Intro</name>
     <message>
-        <source>Bitcoin</source>
+        <source>Diaz</source>
         <translation>Биткоин</translation>
     </message>
     <message>
@@ -310,7 +310,7 @@
     <name>WalletView</name>
     </context>
 <context>
-    <name>bitcoin-core</name>
+    <name>diaz-core</name>
     <message>
         <source>Information</source>
         <translation>Информация</translation>

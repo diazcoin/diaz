@@ -104,7 +104,7 @@
     <name>BanTableModel</name>
     </context>
 <context>
-    <name>BitcoinGUI</name>
+    <name>DiazGUI</name>
     <message>
         <source>Synchronizing with network...</source>
         <translation>Võrguga sünkroniseerimine...</translation>
@@ -130,8 +130,8 @@
         <translation>Kõvakettal olevate plokkide reindekseerimine...</translation>
     </message>
     <message>
-        <source>Bitcoin</source>
-        <translation>Bitcoin</translation>
+        <source>Diaz</source>
+        <translation>Diaz</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -265,8 +265,8 @@
         <translation>Tere tulemast</translation>
     </message>
     <message>
-        <source>Bitcoin</source>
-        <translation>Bitcoin</translation>
+        <source>Diaz</source>
+        <translation>Diaz</translation>
     </message>
     <message>
         <source>Error</source>
@@ -758,10 +758,10 @@
     </message>
     </context>
 <context>
-    <name>bitcoin-core</name>
+    <name>diaz-core</name>
     <message>
-        <source>Bitcoin Core</source>
-        <translation>Bitcoin Core</translation>
+        <source>Diaz Core</source>
+        <translation>Diaz Core</translation>
     </message>
     <message>
         <source>Information</source>
