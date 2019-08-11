@@ -1,5 +1,5 @@
 # Linearize
-Construct a linear, no-fork, best version of the Bitcoin blockchain.
+Construct a linear, no-fork, best version of the diaz blockchain.
 
 ## Step 1: Download hash list
 
@@ -20,7 +20,7 @@ standalone hash lists but safe to use with linearize-data.py, which will output
 the same data no matter which byte format is chosen.
 
 The `linearize-hashes` script requires a connection, local or remote, to a
-JSON-RPC server. Running `diazd` or `bitcoin-qt -server` will be sufficient.
+JSON-RPC server. Running `diazd` or `diaz-qt -server` will be sufficient.
 
 ## Step 2: Copy local block data
 

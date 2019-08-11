@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bitcoin;
+package org.diaz;
 
 public class NativeSecp256k1Util{
 

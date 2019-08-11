@@ -9,14 +9,14 @@ SOURCE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'
 DEFAULT_PLATFORM_TOOLSET = R'v141'
 
 libs = [
-    'libbitcoin_cli',
-    'libbitcoin_common',
-    'libbitcoin_crypto',
-    'libbitcoin_server',
-    'libbitcoin_util',
-    'libbitcoin_wallet_tool',
-    'libbitcoin_wallet',
-    'libbitcoin_zmq',
+    'libdiaz_cli',
+    'libdiaz_common',
+    'libdiaz_crypto',
+    'libdiaz_server',
+    'libdiaz_util',
+    'libdiaz_wallet_tool',
+    'libdiaz_wallet',
+    'libdiaz_zmq',
 ]
 
 ignore_list = [
@@ -53,7 +53,7 @@ def set_common_properties(toolset):
         wfile.write(s)
 
 def main():
-    parser = argparse.ArgumentParser(description='Bitcoin-core msbuild configuration initialiser.')
+    parser = argparse.ArgumentParser(description='Diaz-core msbuild configuration initialiser.')
     parser.add_argument('-toolset', nargs='?',help='Optionally sets the msbuild platform toolset, e.g. v142 for Visual Studio 2019.'
          ' default is %s.'%DEFAULT_PLATFORM_TOOLSET)
     args = parser.parse_args()
