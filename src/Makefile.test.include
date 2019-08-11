@@ -29,11 +29,11 @@ FUZZ_TARGETS = \
 if ENABLE_FUZZ
 noinst_PROGRAMS += $(FUZZ_TARGETS:=)
 else
-bin_PROGRAMS += test/test_bitcoin
+bin_PROGRAMS += test/test_diaz
 endif
 
 TEST_SRCDIR = test
-TEST_BINARY=test/test_bitcoin$(EXEEXT)
+TEST_BINARY=test/test_diaz$(EXEEXT)
 
 JSON_TEST_FILES = \
   test/data/script_tests.json \
@@ -77,7 +77,7 @@ FUZZ_SUITE_LD_COMMON = \
  $(CRYPTO_LIBS) \
  $(EVENT_PTHREADS_LIBS)
 
-# test_bitcoin binary #
+# test_diaz binary #
 DIAZ_TESTS =\
   test/arith_uint256_tests.cpp \
   test/scriptnum10.h \
@@ -177,22 +177,22 @@ DIAZ_TEST_SUITE += \
   wallet/test/init_test_fixture.h
 endif
 
-test_test_bitcoin_SOURCES = $(DIAZ_TEST_SUITE) $(DIAZ_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
-test_test_bitcoin_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(TESTDEFS) $(EVENT_CFLAGS)
-test_test_bitcoin_LDADD =
+test_test_diaz_SOURCES = $(DIAZ_TEST_SUITE) $(DIAZ_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
+test_test_diaz_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(TESTDEFS) $(EVENT_CFLAGS)
+test_test_diaz_LDADD =
 if ENABLE_WALLET
-test_test_bitcoin_LDADD += $(LIBDIAZ_WALLET)
+test_test_diaz_LDADD += $(LIBDIAZ_WALLET)
 endif
 
-test_test_bitcoin_LDADD += $(LIBDIAZ_SERVER) $(LIBDIAZ_CLI) $(LIBDIAZ_COMMON) $(LIBDIAZ_UTIL) $(LIBDIAZ_CONSENSUS) $(LIBDIAZ_CRYPTO) $(LIBUNIVALUE) \
+test_test_diaz_LDADD += $(LIBDIAZ_SERVER) $(LIBDIAZ_CLI) $(LIBDIAZ_COMMON) $(LIBDIAZ_UTIL) $(LIBDIAZ_CONSENSUS) $(LIBDIAZ_CRYPTO) $(LIBUNIVALUE) \
   $(LIBLEVELDB) $(LIBLEVELDB_SSE42) $(LIBMEMENV) $(BOOST_LIBS) $(BOOST_UNIT_TEST_FRAMEWORK_LIB) $(LIBSECP256K1) $(EVENT_LIBS) $(EVENT_PTHREADS_LIBS)
-test_test_bitcoin_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+test_test_diaz_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
-test_test_bitcoin_LDADD += $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(RAPIDCHECK_LIBS)
-test_test_bitcoin_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
+test_test_diaz_LDADD += $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(RAPIDCHECK_LIBS)
+test_test_diaz_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
 
 if ENABLE_ZMQ
-test_test_bitcoin_LDADD += $(LIBDIAZ_ZMQ) $(ZMQ_LIBS)
+test_test_diaz_LDADD += $(LIBDIAZ_ZMQ) $(ZMQ_LIBS)
 endif
 
 if ENABLE_FUZZ
@@ -323,7 +323,7 @@ test_fuzz_blocktransactionsrequest_deserialize_LDFLAGS = $(RELDFLAGS) $(AM_LDFLA
 test_fuzz_blocktransactionsrequest_deserialize_LDADD = $(FUZZ_SUITE_LD_COMMON)
 endif # ENABLE_FUZZ
 
-nodist_test_test_bitcoin_SOURCES = $(GENERATED_TEST_FILES)
+nodist_test_test_diaz_SOURCES = $(GENERATED_TEST_FILES)
 
 $(DIAZ_TESTS): $(GENERATED_TEST_FILES)
 
@@ -332,32 +332,32 @@ CLEAN_DIAZ_TEST = test/*.gcda test/*.gcno $(GENERATED_TEST_FILES) $(DIAZ_TESTS:=
 CLEANFILES += $(CLEAN_DIAZ_TEST)
 
 if TARGET_WINDOWS
-bitcoin_test: $(TEST_BINARY)
+diaz_test: $(TEST_BINARY)
 else
 if ENABLE_BENCH
-bitcoin_test: $(TEST_BINARY) $(BENCH_BINARY)
+diaz_test: $(TEST_BINARY) $(BENCH_BINARY)
 else
-bitcoin_test: $(TEST_BINARY)
+diaz_test: $(TEST_BINARY)
 endif
 endif
 
-bitcoin_test_check: $(TEST_BINARY) FORCE
+diaz_test_check: $(TEST_BINARY) FORCE
 	$(MAKE) check-TESTS TESTS=$^
 
-bitcoin_test_clean : FORCE
-	rm -f $(CLEAN_DIAZ_TEST) $(test_test_bitcoin_OBJECTS) $(TEST_BINARY)
+diaz_test_clean : FORCE
+	rm -f $(CLEAN_DIAZ_TEST) $(test_test_diaz_OBJECTS) $(TEST_BINARY)
 
 check-local: $(DIAZ_TESTS:.cpp=.cpp.test)
 if BUILD_DIAZ_TX
-	@echo "Running test/util/bitcoin-util-test.py..."
-	$(PYTHON) $(top_builddir)/test/util/bitcoin-util-test.py
+	@echo "Running test/util/diaz-util-test.py..."
+	$(PYTHON) $(top_builddir)/test/util/diaz-util-test.py
 endif
 	@echo "Running test/util/rpcauth-test.py..."
 	$(PYTHON) $(top_builddir)/test/util/rpcauth-test.py
 if TARGET_WINDOWS
 else
 if ENABLE_BENCH
-	@echo "Running bench/bench_bitcoin -evals=1 -scaling=0..."
+	@echo "Running bench/bench_diaz -evals=1 -scaling=0..."
 	$(BENCH_BINARY) -evals=1 -scaling=0 > /dev/null
 endif
 endif
