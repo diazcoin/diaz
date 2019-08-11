@@ -41,7 +41,7 @@ static const int TOOLTIP_WRAP_THRESHOLD = 80;
 #define SPINNER_FRAMES 36
 
 #define QAPP_ORG_NAME "Diaz"
-#define QAPP_ORG_DOMAIN "bitcoin.org"
+#define QAPP_ORG_DOMAIN "diaz.org"
 #define QAPP_APP_NAME_DEFAULT "Diaz-Qt"
 #define QAPP_APP_NAME_TESTNET "Diaz-Qt-testnet"
 #define QAPP_APP_NAME_REGTEST "Diaz-Qt-regtest"

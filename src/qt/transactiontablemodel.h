@@ -5,7 +5,7 @@
 #ifndef DIAZ_QT_TRANSACTIONTABLEMODEL_H
 #define DIAZ_QT_TRANSACTIONTABLEMODEL_H
 
-#include <qt/bitcoinunits.h>
+#include <qt/diazunits.h>
 
 #include <QAbstractTableModel>
 #include <QStringList>
