@@ -1,9 +1,9 @@
-Bitcoin Core integration/staging tree
+Diazcoin Core integration/staging tree
 =====================================
 
 https://bitcoincore.org
 
-What is Bitcoin?
+What is Diaz?
 ----------------
 
 Bitcoin is an experimental digital currency that enables instant payments to
