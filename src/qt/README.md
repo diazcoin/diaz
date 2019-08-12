@@ -1,4 +1,4 @@
-This directory contains the BitcoinQT graphical user interface (GUI). It uses the cross-platform framework [Qt](https://www1.qt.io/developers/).
+This directory contains the DiazQT graphical user interface (GUI). It uses the cross-platform framework [Qt](https://www1.qt.io/developers/).
 
 The current precise version for Qt 5 is specified in [qt.mk](/depends/packages/qt.mk).
 
@@ -32,7 +32,7 @@ Tests.
 
 ### diazgui.(h/cpp)
 
-Represents the main window of the Bitcoin UI.
+Represents the main window of the Diaz UI.
 
 ### \*model.(h/cpp)
 
@@ -58,7 +58,7 @@ Represents the view to a single wallet.
 
 ### Other .h/cpp files
 
-* UI elements like BitcoinAmountField, which inherit from QWidget.
+* UI elements like DiazAmountField, which inherit from QWidget.
 * `diazstrings.cpp`: automatically generated
 * `diazunits.(h/cpp)`: DIAZ / mDIAZ / etc handling
 * `callback.h`

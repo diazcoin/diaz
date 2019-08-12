@@ -219,8 +219,8 @@ static UniValue addnode(const JSONRPCRequest& request)
                 },
                 RPCResults{},
                 RPCExamples{
-                    HelpExampleCli("addnode", "\"192.168.0.6:48333\" \"onetry\"")
-            + HelpExampleRpc("addnode", "\"192.168.0.6:48333\", \"onetry\"")
+                    HelpExampleCli("addnode", "\"192.168.0.6:48330\" \"onetry\"")
+            + HelpExampleRpc("addnode", "\"192.168.0.6:48330\", \"onetry\"")
                 },
             }.ToString());
 
@@ -262,9 +262,9 @@ static UniValue disconnectnode(const JSONRPCRequest& request)
                 },
                 RPCResults{},
                 RPCExamples{
-                    HelpExampleCli("disconnectnode", "\"192.168.0.6:48333\"")
+                    HelpExampleCli("disconnectnode", "\"192.168.0.6:48330\"")
             + HelpExampleCli("disconnectnode", "\"\" 1")
-            + HelpExampleRpc("disconnectnode", "\"192.168.0.6:48333\"")
+            + HelpExampleRpc("disconnectnode", "\"192.168.0.6:48330\"")
             + HelpExampleRpc("disconnectnode", "\"\", 1")
                 },
             }.Check(request);
@@ -309,7 +309,7 @@ static UniValue getaddednodeinfo(const JSONRPCRequest& request)
             "    \"connected\" : true|false,          (boolean) If connected\n"
             "    \"addresses\" : [                    (list of objects) Only when connected = true\n"
             "       {\n"
-            "         \"address\" : \"192.168.0.201:48333\",  (string) The diaz server IP and port we're connected to\n"
+            "         \"address\" : \"192.168.0.201:48330\",  (string) The diaz server IP and port we're connected to\n"
             "         \"connected\" : \"outbound\"           (string) connection, inbound or outbound\n"
             "       }\n"
             "     ]\n"

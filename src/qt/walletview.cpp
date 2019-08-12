@@ -86,15 +86,15 @@ WalletView::~WalletView()
 {
 }
 
-void WalletView::setBitcoinGUI(BitcoinGUI *gui)
+void WalletView::setDiazGUI(DiazGUI *gui)
 {
     if (gui)
     {
         // Clicking on a transaction on the overview page simply sends you to transaction history page
-        connect(overviewPage, &OverviewPage::transactionClicked, gui, &BitcoinGUI::gotoHistoryPage);
+        connect(overviewPage, &OverviewPage::transactionClicked, gui, &DiazGUI::gotoHistoryPage);
 
         // Navigate to transaction history page after send
-        connect(sendCoinsPage, &SendCoinsDialog::coinsSent, gui, &BitcoinGUI::gotoHistoryPage);
+        connect(sendCoinsPage, &SendCoinsDialog::coinsSent, gui, &DiazGUI::gotoHistoryPage);
 
         // Receive and report messages
         connect(this, &WalletView::message, [gui](const QString &title, const QString &message, unsigned int style) {
@@ -102,13 +102,13 @@ void WalletView::setBitcoinGUI(BitcoinGUI *gui)
         });
 
         // Pass through encryption status changed signals
-        connect(this, &WalletView::encryptionStatusChanged, gui, &BitcoinGUI::updateWalletStatus);
+        connect(this, &WalletView::encryptionStatusChanged, gui, &DiazGUI::updateWalletStatus);
 
         // Pass through transaction notifications
-        connect(this, &WalletView::incomingTransaction, gui, &BitcoinGUI::incomingTransaction);
+        connect(this, &WalletView::incomingTransaction, gui, &DiazGUI::incomingTransaction);
 
         // Connect HD enabled state signal
-        connect(this, &WalletView::hdEnabledStatusChanged, gui, &BitcoinGUI::updateWalletStatus);
+        connect(this, &WalletView::hdEnabledStatusChanged, gui, &DiazGUI::updateWalletStatus);
     }
 }
 

@@ -98,21 +98,21 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1510704000; // November 15th, 2017.
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x");
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000500050005");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x"); //563378
+        consensus.defaultAssumeValid = uint256S("0x00000000482b2b1d2050d3198ad01f8bec9495250a0d6ff47629fafdde9dc57b"); 
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xa2;
-        pchMessageStart[1] = 0xfd;
-        pchMessageStart[2] = 0xb3;
-        pchMessageStart[3] = 0xe9;
-        nDefaultPort = 48333;
+        pchMessageStart[0] = 0x99;
+        pchMessageStart[1] = 0xe7;
+        pchMessageStart[2] = 0xba;
+        pchMessageStart[3] = 0x8b;
+        nDefaultPort = 48330;
         nPruneAfterHeight = 100000;
         m_assumed_blockchain_size = 240;
         m_assumed_chain_state_size = 3;
@@ -137,7 +137,7 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
 
-        bech32_hrp = "bc";
+        bech32_hrp = "7";
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
@@ -147,15 +147,18 @@ public:
 
         checkpointData = {
             {
-                { 0, uint256S("0x0x00000000113342549a6b0fb2cfae47ed8b516199018bdb0c6140bdf48c05009d")},
+                { 0, uint256S("0x00000000113342549a6b0fb2cfae47ed8b516199018bdb0c6140bdf48c05009d")},
+                { 1, uint256S("0x00000000edebfeffda3bf26ee53dd01b15eb5420a83e4c6922088e4a6b7dffb5")},
+                { 2, uint256S("0x000000006a890599e291262edba0f0fa6d383c2d6804f331cba43a271a2322e4")},
+                { 4, uint256S("0x00000000482b2b1d2050d3198ad01f8bec9495250a0d6ff47629fafdde9dc57b")},
 
             }
         };
 
         chainTxData = ChainTxData{
             // Data from rpc: getchaintxstats 4096 0000000000000000000f1c54590ee18d15ec70e68c8cd4cfbadb1b4f11697eee
-            /* nTime    */ 1565465256,
-            /* nTxCount */ 0,
+            /* nTime    */ 1565578185,
+            /* nTxCount */ 5,
             /* dTxRate  */ 0
         };
     }
