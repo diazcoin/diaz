@@ -21,6 +21,8 @@ the Bitcoin Core software, see https://diazwallet.online/en/download/, or read t
 | --- | --- |
 | Port | 48330 |
 | RPCPORT | 48332 |
+| Pool | https://mine.diazwallet.online |
+| Explorer | https://blocks.diazwallet.online |
 
 License
 -------
