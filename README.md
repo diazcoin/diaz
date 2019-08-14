@@ -19,8 +19,8 @@ the Bitcoin Core software, see https://diazwallet.online/en/download/, or read t
 
 | Diaz | Description |
 | --- | --- |
-| ###Port | 48330 |
-| ###RPCPORT | 48332 |
+| Port | 48330 |
+| RPCPORT | 48332 |
 
 License
 -------
