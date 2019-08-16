@@ -74,7 +74,7 @@ Obviously, it is important to build and run the tests at appropriate times -- bu
 
 ```sh
 make src/diazd src/diaz-cli
-make src/qt/bitcoin-qt
+make src/qt/diaz-qt
 make -C src bitcoin_bench
 ```
 
