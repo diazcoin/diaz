@@ -19,7 +19,7 @@ the Bitcoin Core software, see https://diazwallet.online/en/download/, or read t
 
 | Diaz | Description |
 | --- | --- |
-| Port | 48330 |
+| Port | 48338 |
 | RPCPORT | 48332 |
 | Pool | https://mine.diazwallet.online |
 | Explorer | https://blocks.diazwallet.online |
