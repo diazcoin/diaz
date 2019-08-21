@@ -4,6 +4,7 @@
 
 #include <bench/bench.h>
 
+#include <validation.h>
 #include <base58.h>
 
 #include <array>
@@ -48,7 +49,7 @@ static void Base58Decode(benchmark::State& state)
     const char* addr = "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem";
     std::vector<unsigned char> vch;
     while (state.KeepRunning()) {
-        (void) DecodeBase58(addr, vch);
+        DecodeBase58(addr, vch);
     }
 }
 

@@ -6,7 +6,6 @@ bin_PROGRAMS += qt/test/test_diaz-qt
 TESTS += qt/test/test_diaz-qt
 
 TEST_QT_MOC_CPP = \
-  qt/test/moc_apptests.cpp \
   qt/test/moc_compattests.cpp \
   qt/test/moc_rpcnestedtests.cpp \
   qt/test/moc_uritests.cpp
@@ -14,16 +13,12 @@ TEST_QT_MOC_CPP = \
 if ENABLE_WALLET
 TEST_QT_MOC_CPP += \
   qt/test/moc_addressbooktests.cpp \
+  qt/test/moc_paymentservertests.cpp \
   qt/test/moc_wallettests.cpp
-if ENABLE_BIP70
-TEST_QT_MOC_CPP += \
-  qt/test/moc_paymentservertests.cpp
-endif # ENABLE_BIP70
-endif # ENABLE_WALLET
+endif
 
 TEST_QT_H = \
   qt/test/addressbooktests.h \
-  qt/test/apptests.h \
   qt/test/compattests.h \
   qt/test/rpcnestedtests.h \
   qt/test/uritests.h \
@@ -33,16 +28,15 @@ TEST_QT_H = \
   qt/test/wallettests.h
 
 TEST_DIAZ_CPP = \
-  test/setup_common.cpp
+  test/test_diaz.cpp
 
 TEST_DIAZ_H = \
-  test/setup_common.h
+  test/test_diaz.h
 
 qt_test_test_diaz_qt_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(DIAZ_QT_INCLUDES) \
   $(QT_INCLUDES) $(QT_TEST_INCLUDES) $(PROTOBUF_CFLAGS)
 
 qt_test_test_diaz_qt_SOURCES = \
-  qt/test/apptests.cpp \
   qt/test/compattests.cpp \
   qt/test/rpcnestedtests.cpp \
   qt/test/test_main.cpp \
@@ -54,13 +48,10 @@ qt_test_test_diaz_qt_SOURCES = \
 if ENABLE_WALLET
 qt_test_test_diaz_qt_SOURCES += \
   qt/test/addressbooktests.cpp \
+  qt/test/paymentservertests.cpp \
   qt/test/wallettests.cpp \
   wallet/test/wallet_test_fixture.cpp
-if ENABLE_BIP70
-qt_test_test_diaz_qt_SOURCES += \
-  qt/test/paymentservertests.cpp
-endif # ENABLE_BIP70
-endif # ENABLE_WALLET
+endif
 
 nodist_qt_test_test_diaz_qt_SOURCES = $(TEST_QT_MOC_CPP)
 

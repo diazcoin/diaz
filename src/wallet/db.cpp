@@ -1,12 +1,15 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2019 The Bitcoin Core developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <wallet/db.h>
 
-#include <util/strencodings.h>
-#include <util/translation.h>
+#include <addrman.h>
+#include <hash.h>
+#include <protocol.h>
+#include <utilstrencodings.h>
+#include <wallet/walletutil.h>
 
 #include <stdint.h>
 
@@ -25,7 +28,7 @@ namespace {
 //!
 //! BerkeleyDB generates unique fileids by default
 //! (https://docs.oracle.com/cd/E17275_01/html/programmer_reference/program_copy.html),
-//! so bitcoin should never create different databases with the same fileid, but
+//! so diaz should never create different databases with the same fileid, but
 //! this error can be triggered if users manually copy database files.
 void CheckUniqueFileid(const BerkeleyEnvironment& env, const std::string& filename, Db& db, WalletDatabaseFileId& fileid)
 {
@@ -79,14 +82,6 @@ bool IsWalletLoaded(const fs::path& wallet_path)
     if (env == g_dbenvs.end()) return false;
     auto database = env->second.lock();
     return database && database->IsDatabaseLoaded(database_filename);
-}
-
-fs::path WalletDataFilePath(const fs::path& wallet_path)
-{
-    fs::path env_directory;
-    std::string database_filename;
-    SplitWalletPath(wallet_path, env_directory, database_filename);
-    return env_directory / database_filename;
 }
 
 /**
@@ -159,7 +154,6 @@ BerkeleyEnvironment::BerkeleyEnvironment(const fs::path& dir_path) : strPath(dir
 
 BerkeleyEnvironment::~BerkeleyEnvironment()
 {
-    LOCK(cs_db);
     g_dbenvs.erase(strPath);
     Close();
 }
@@ -287,45 +281,6 @@ BerkeleyEnvironment::VerifyResult BerkeleyEnvironment::Verify(const std::string&
     return (fRecovered ? VerifyResult::RECOVER_OK : VerifyResult::RECOVER_FAIL);
 }
 
-BerkeleyBatch::SafeDbt::SafeDbt()
-{
-    m_dbt.set_flags(DB_DBT_MALLOC);
-}
-
-BerkeleyBatch::SafeDbt::SafeDbt(void* data, size_t size)
-    : m_dbt(data, size)
-{
-}
-
-BerkeleyBatch::SafeDbt::~SafeDbt()
-{
-    if (m_dbt.get_data() != nullptr) {
-        // Clear memory, e.g. in case it was a private key
-        memory_cleanse(m_dbt.get_data(), m_dbt.get_size());
-        // under DB_DBT_MALLOC, data is malloced by the Dbt, but must be
-        // freed by the caller.
-        // https://docs.oracle.com/cd/E17275_01/html/api_reference/C/dbt.html
-        if (m_dbt.get_flags() & DB_DBT_MALLOC) {
-            free(m_dbt.get_data());
-        }
-    }
-}
-
-const void* BerkeleyBatch::SafeDbt::get_data() const
-{
-    return m_dbt.get_data();
-}
-
-u_int32_t BerkeleyBatch::SafeDbt::get_size() const
-{
-    return m_dbt.get_size();
-}
-
-BerkeleyBatch::SafeDbt::operator Dbt*()
-{
-    return &m_dbt;
-}
-
 bool BerkeleyBatch::Recover(const fs::path& file_path, void *callbackDataIn, bool (*recoverKVcallback)(void* callbackData, CDataStream ssKey, CDataStream ssValue), std::string& newFilename)
 {
     std::string filename;
@@ -401,11 +356,18 @@ bool BerkeleyBatch::VerifyEnvironment(const fs::path& file_path, std::string& er
     std::shared_ptr<BerkeleyEnvironment> env = GetWalletEnv(file_path, walletFile);
     fs::path walletDir = env->Directory();
 
-    LogPrintf("Using BerkeleyDB version %s\n", DbEnv::version(nullptr, nullptr, nullptr));
-    LogPrintf("Using wallet %s\n", file_path.string());
+    LogPrintf("Using BerkeleyDB version %s\n", DbEnv::version(0, 0, 0));
+    LogPrintf("Using wallet %s\n", walletFile);
+
+    // Wallet file must be a plain filename without a directory
+    if (walletFile != fs::basename(walletFile) + fs::extension(walletFile))
+    {
+        errorStr = strprintf(_("Wallet %s resides outside wallet directory %s"), walletFile, walletDir.string());
+        return false;
+    }
 
     if (!env->Open(true /* retry */)) {
-        errorStr = strprintf(_("Error initializing wallet database environment %s!").translated, walletDir);
+        errorStr = strprintf(_("Error initializing wallet database environment %s!"), walletDir);
         return false;
     }
 
@@ -427,12 +389,12 @@ bool BerkeleyBatch::VerifyDatabaseFile(const fs::path& file_path, std::string& w
             warningStr = strprintf(_("Warning: Wallet file corrupt, data salvaged!"
                                      " Original %s saved as %s in %s; if"
                                      " your balance or transactions are incorrect you should"
-                                     " restore from a backup.").translated,
+                                     " restore from a backup."),
                                    walletFile, backup_filename, walletDir);
         }
         if (r == BerkeleyEnvironment::VerifyResult::RECOVER_FAIL)
         {
-            errorStr = strprintf(_("%s corrupt, salvage failed").translated, walletFile);
+            errorStr = strprintf(_("%s corrupt, salvage failed"), walletFile);
             return false;
         }
     }
@@ -565,7 +527,7 @@ BerkeleyBatch::BerkeleyBatch(BerkeleyDatabase& database, const char* pszMode, bo
             // files in the same environment have the same fileid.
             //
             // Also call CheckUniqueFileid on all the other g_dbenvs to prevent
-            // bitcoin from opening the same data file through another
+            // diaz from opening the same data file through another
             // environment when the file is referenced through equivalent but
             // not obviously identical symlinked or hard linked or bind mounted
             // paths. In the future a more relaxed check for equal inode and
@@ -575,7 +537,7 @@ BerkeleyBatch::BerkeleyBatch(BerkeleyDatabase& database, const char* pszMode, bo
             // be implemented, so no equality checks are needed at all. (Newer
             // versions of BDB have an set_lk_exclusive method for this
             // purpose, but the older version we use does not.)
-            for (const auto& env : g_dbenvs) {
+            for (auto& env : g_dbenvs) {
                 CheckUniqueFileid(*env.second.lock().get(), strFilename, *pdb_temp, this->env->m_fileids[strFilename]);
             }
 
@@ -585,7 +547,7 @@ BerkeleyBatch::BerkeleyBatch(BerkeleyDatabase& database, const char* pszMode, bo
             if (fCreate && !Exists(std::string("version"))) {
                 bool fTmp = fReadOnly;
                 fReadOnly = false;
-                Write(std::string("version"), CLIENT_VERSION);
+                WriteVersion(CLIENT_VERSION);
                 fReadOnly = fTmp;
             }
         }
@@ -604,9 +566,7 @@ void BerkeleyBatch::Flush()
     if (fReadOnly)
         nMinutes = 1;
 
-    if (env) { // env is nullptr for dummy databases (i.e. in tests). Don't actually flush if env is nullptr so we don't segfault
-        env->dbenv->txn_checkpoint(nMinutes ? gArgs.GetArg("-dblogsize", DEFAULT_WALLET_DBLOGSIZE) * 1024 : 0, nMinutes, 0);
-    }
+    env->dbenv->txn_checkpoint(nMinutes ? gArgs.GetArg("-dblogsize", DEFAULT_WALLET_DBLOGSIZE) * 1024 : 0, nMinutes, 0);
 }
 
 void BerkeleyDatabase::IncrementUpdateCounter()
@@ -767,7 +727,7 @@ void BerkeleyEnvironment::Flush(bool fShutdown)
 {
     int64_t nStart = GetTimeMillis();
     // Flush log data to the actual data file on all files that are not in use
-    LogPrint(BCLog::DB, "BerkeleyEnvironment::Flush: [%s] Flush(%s)%s\n", strPath, fShutdown ? "true" : "false", fDbEnvInit ? "" : " database not started");
+    LogPrint(BCLog::DB, "BerkeleyEnvironment::Flush: Flush(%s)%s\n", fShutdown ? "true" : "false", fDbEnvInit ? "" : " database not started");
     if (!fDbEnvInit)
         return;
     {
@@ -884,7 +844,7 @@ bool BerkeleyDatabase::Backup(const std::string& strDest)
                     LogPrintf("copied %s to %s\n", strFile, pathDest.string());
                     return true;
                 } catch (const fs::filesystem_error& e) {
-                    LogPrintf("error copying %s to %s - %s\n", strFile, pathDest.string(), fsbridge::get_filesystem_error_message(e));
+                    LogPrintf("error copying %s to %s - %s\n", strFile, pathDest.string(), e.what());
                     return false;
                 }
             }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2017-2019 The Bitcoin Core developers
+# Copyright (c) 2017-2018 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test message sending before handshake completion.
@@ -14,7 +14,7 @@ import time
 
 from test_framework.messages import msg_getaddr, msg_ping, msg_verack
 from test_framework.mininode import mininode_lock, P2PInterface
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.util import wait_until
 
 banscore = 10
@@ -88,10 +88,13 @@ class CNodeNoVerackIdle(CLazyNode):
         self.send_message(msg_ping())
         self.send_message(msg_getaddr())
 
-class P2PLeakTest(BitcoinTestFramework):
+class P2PLeakTest(DiazTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.extra_args = [['-banscore=' + str(banscore)]]
+
+    def skip_test_if_missing_module(self):
+        self.skip_if_no_wallet()
 
     def run_test(self):
         no_version_bannode = self.nodes[0].add_p2p_connection(CNodeNoVersionBan(), send_version=False, wait_for_verack=False)
@@ -103,7 +106,7 @@ class P2PLeakTest(BitcoinTestFramework):
         wait_until(lambda: no_verack_idlenode.version_received, timeout=10, lock=mininode_lock)
 
         # Mine a block and make sure that it's not sent to the connected nodes
-        self.nodes[0].generatetoaddress(1, self.nodes[0].get_deterministic_priv_key().address)
+        self.nodes[0].generate(1)
 
         #Give the node enough time to possibly leak out a message
         time.sleep(5)
@@ -117,9 +120,9 @@ class P2PLeakTest(BitcoinTestFramework):
         wait_until(lambda: len(self.nodes[0].getpeerinfo()) == 0)
 
         # Make sure no unexpected messages came in
-        assert no_version_bannode.unexpected_msg == False
-        assert no_version_idlenode.unexpected_msg == False
-        assert no_verack_idlenode.unexpected_msg == False
+        assert(no_version_bannode.unexpected_msg == False)
+        assert(no_version_idlenode.unexpected_msg == False)
+        assert(no_verack_idlenode.unexpected_msg == False)
 
 
 if __name__ == '__main__':

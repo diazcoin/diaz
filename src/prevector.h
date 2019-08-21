@@ -10,10 +10,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
+
+#include <compat.h>
 
 #pragma pack(push, 1)
 /** Implements a drop-in replacement for std::vector<T> which stores up to N
@@ -147,14 +148,14 @@ public:
     };
 
 private:
-    size_type _size = 0;
+    size_type _size;
     union direct_or_indirect {
         char direct[sizeof(T) * N];
         struct {
             size_type capacity;
             char* indirect;
         };
-    } _union = {};
+    } _union;
 
     T* direct_ptr(difference_type pos) { return reinterpret_cast<T*>(_union.direct) + pos; }
     const T* direct_ptr(difference_type pos) const { return reinterpret_cast<const T*>(_union.direct) + pos; }
@@ -196,8 +197,23 @@ private:
     T* item_ptr(difference_type pos) { return is_direct() ? direct_ptr(pos) : indirect_ptr(pos); }
     const T* item_ptr(difference_type pos) const { return is_direct() ? direct_ptr(pos) : indirect_ptr(pos); }
 
-    void fill(T* dst, ptrdiff_t count, const T& value = T{}) {
-        std::fill_n(dst, count, value);
+    void fill(T* dst, ptrdiff_t count) {
+        if (IS_TRIVIALLY_CONSTRUCTIBLE<T>::value) {
+            // The most common use of prevector is where T=unsigned char. For
+            // trivially constructible types, we can use memset() to avoid
+            // looping.
+            ::memset(dst, 0, count * sizeof(T));
+        } else {
+            for (auto i = 0; i < count; ++i) {
+                new(static_cast<void*>(dst + i)) T();
+            }
+        }
+    }
+
+    void fill(T* dst, ptrdiff_t count, const T& value) {
+        for (auto i = 0; i < count; ++i) {
+            new(static_cast<void*>(dst + i)) T(value);
+        }
     }
 
     template<typename InputIterator>
@@ -230,34 +246,34 @@ public:
         fill(item_ptr(0), first, last);
     }
 
-    prevector() {}
+    prevector() : _size(0), _union{{}} {}
 
-    explicit prevector(size_type n) {
+    explicit prevector(size_type n) : _size(0) {
         resize(n);
     }
 
-    explicit prevector(size_type n, const T& val) {
+    explicit prevector(size_type n, const T& val = T()) : _size(0) {
         change_capacity(n);
         _size += n;
         fill(item_ptr(0), n, val);
     }
 
     template<typename InputIterator>
-    prevector(InputIterator first, InputIterator last) {
+    prevector(InputIterator first, InputIterator last) : _size(0) {
         size_type n = last - first;
         change_capacity(n);
         _size += n;
         fill(item_ptr(0), first, last);
     }
 
-    prevector(const prevector<N, T, Size, Diff>& other) {
+    prevector(const prevector<N, T, Size, Diff>& other) : _size(0) {
         size_type n = other.size();
         change_capacity(n);
         _size += n;
         fill(item_ptr(0), other.begin(),  other.end());
     }
 
-    prevector(prevector<N, T, Size, Diff>&& other) {
+    prevector(prevector<N, T, Size, Diff>&& other) : _size(0) {
         swap(other);
     }
 
@@ -376,21 +392,6 @@ public:
         memmove(ptr + count, ptr, (size() - p) * sizeof(T));
         _size += count;
         fill(ptr, first, last);
-    }
-
-    inline void resize_uninitialized(size_type new_size) {
-        // resize_uninitialized changes the size of the prevector but does not initialize it.
-        // If size < new_size, the added elements must be initialized explicitly.
-        if (capacity() < new_size) {
-            change_capacity(new_size);
-            _size += new_size - size();
-            return;
-        }
-        if (new_size < size()) {
-            erase(item_ptr(new_size), end());
-        } else {
-            _size += new_size - size();
-        }
     }
 
     iterator erase(iterator pos) {

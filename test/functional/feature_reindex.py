@@ -9,17 +9,20 @@
 - Stop the node and restart it with -reindex-chainstate. Verify that the node has reindexed up to block 3.
 """
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.util import wait_until
 
-class ReindexTest(BitcoinTestFramework):
+class ReindexTest(DiazTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 1
 
+    def skip_test_if_missing_module(self):
+        self.skip_if_no_wallet()
+
     def reindex(self, justchainstate=False):
-        self.nodes[0].generatetoaddress(3, self.nodes[0].get_deterministic_priv_key().address)
+        self.nodes[0].generate(3)
         blockcount = self.nodes[0].getblockcount()
         self.stop_nodes()
         extra_args = [["-reindex-chainstate" if justchainstate else "-reindex"]]

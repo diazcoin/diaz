@@ -5,23 +5,19 @@
 #ifndef DIAZ_RPC_BLOCKCHAIN_H
 #define DIAZ_RPC_BLOCKCHAIN_H
 
-#include <amount.h>
-#include <sync.h>
-
-#include <stdint.h>
 #include <vector>
-
-extern RecursiveMutex cs_main;
+#include <stdint.h>
+#include <amount.h>
 
 class CBlock;
 class CBlockIndex;
-class CTxMemPool;
 class UniValue;
 
 static constexpr int NUM_GETBLOCKSTATS_PERCENTILES = 5;
 
 /**
- * Get the difficulty of the net wrt to the given block index.
+ * Get the difficulty of the net wrt to the given block index, or the chain tip if
+ * not provided.
  *
  * @return A floating point number that is a multiple of the main net minimum
  * difficulty (4295032833 hashes).
@@ -32,16 +28,16 @@ double GetDifficulty(const CBlockIndex* blockindex);
 void RPCNotifyBlockChange(bool ibd, const CBlockIndex *);
 
 /** Block description to JSON */
-UniValue blockToJSON(const CBlock& block, const CBlockIndex* tip, const CBlockIndex* blockindex, bool txDetails = false) LOCKS_EXCLUDED(cs_main);
+UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDetails = false);
 
 /** Mempool information to JSON */
-UniValue MempoolInfoToJSON(const CTxMemPool& pool);
+UniValue mempoolInfoToJSON();
 
 /** Mempool to JSON */
-UniValue MempoolToJSON(const CTxMemPool& pool, bool verbose = false);
+UniValue mempoolToJSON(bool fVerbose = false);
 
 /** Block header to JSON */
-UniValue blockheaderToJSON(const CBlockIndex* tip, const CBlockIndex* blockindex) LOCKS_EXCLUDED(cs_main);
+UniValue blockheaderToJSON(const CBlockIndex* blockindex);
 
 /** Used by getblockstats to get feerates at different percentiles by weight  */
 void CalculatePercentilesByWeight(CAmount result[NUM_GETBLOCKSTATS_PERCENTILES], std::vector<std::pair<CAmount, int64_t>>& scores, int64_t total_weight);

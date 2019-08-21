@@ -1,13 +1,12 @@
-// Copyright (c) 2012-2019 The Bitcoin Core developers
+// Copyright (c) 2012-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <util/memory.h>
-#include <util/system.h>
-#include <util/time.h>
+#include <util.h>
+#include <utiltime.h>
 #include <validation.h>
 
-#include <test/setup_common.h>
+#include <test/test_diaz.h>
 #include <checkqueue.h>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread.hpp>
@@ -18,6 +17,8 @@
 #include <condition_variable>
 
 #include <unordered_set>
+#include <memory>
+#include <random.h>
 
 // BasicTestingSetup not sufficient because nScriptCheckThreads is not set
 // otherwise.
@@ -147,14 +148,14 @@ typedef CCheckQueue<FrozenCleanupCheck> FrozenCleanup_Queue;
  */
 static void Correct_Queue_range(std::vector<size_t> range)
 {
-    auto small_queue = MakeUnique<Correct_Queue>(QUEUE_BATCH_SIZE);
+    auto small_queue = std::unique_ptr<Correct_Queue>(new Correct_Queue {QUEUE_BATCH_SIZE});
     boost::thread_group tg;
     for (auto x = 0; x < nScriptCheckThreads; ++x) {
        tg.create_thread([&]{small_queue->Thread();});
     }
     // Make vChecks here to save on malloc (this test can be slow...)
     std::vector<FakeCheckCheckCompletion> vChecks;
-    for (const size_t i : range) {
+    for (auto i : range) {
         size_t total = i;
         FakeCheckCheckCompletion::n_calls = 0;
         CCheckQueueControl<FakeCheckCheckCompletion> control(small_queue.get());
@@ -166,6 +167,7 @@ static void Correct_Queue_range(std::vector<size_t> range)
         BOOST_REQUIRE(control.Wait());
         if (FakeCheckCheckCompletion::n_calls != i) {
             BOOST_REQUIRE_EQUAL(FakeCheckCheckCompletion::n_calls, i);
+            BOOST_TEST_MESSAGE("Failure on trial " << i << " expected, got " << FakeCheckCheckCompletion::n_calls);
         }
     }
     tg.interrupt_all();
@@ -211,7 +213,7 @@ BOOST_AUTO_TEST_CASE(test_CheckQueue_Correct_Random)
 /** Test that failing checks are caught */
 BOOST_AUTO_TEST_CASE(test_CheckQueue_Catches_Failure)
 {
-    auto fail_queue = MakeUnique<Failing_Queue>(QUEUE_BATCH_SIZE);
+    auto fail_queue = std::unique_ptr<Failing_Queue>(new Failing_Queue {QUEUE_BATCH_SIZE});
 
     boost::thread_group tg;
     for (auto x = 0; x < nScriptCheckThreads; ++x) {
@@ -244,14 +246,14 @@ BOOST_AUTO_TEST_CASE(test_CheckQueue_Catches_Failure)
 // future blocks, ie, the bad state is cleared.
 BOOST_AUTO_TEST_CASE(test_CheckQueue_Recovers_From_Failure)
 {
-    auto fail_queue = MakeUnique<Failing_Queue>(QUEUE_BATCH_SIZE);
+    auto fail_queue = std::unique_ptr<Failing_Queue>(new Failing_Queue {QUEUE_BATCH_SIZE});
     boost::thread_group tg;
     for (auto x = 0; x < nScriptCheckThreads; ++x) {
        tg.create_thread([&]{fail_queue->Thread();});
     }
 
     for (auto times = 0; times < 10; ++times) {
-        for (const bool end_fails : {true, false}) {
+        for (bool end_fails : {true, false}) {
             CCheckQueueControl<FailingCheck> control(fail_queue.get());
             {
                 std::vector<FailingCheck> vChecks;
@@ -272,7 +274,7 @@ BOOST_AUTO_TEST_CASE(test_CheckQueue_Recovers_From_Failure)
 // more than once as well
 BOOST_AUTO_TEST_CASE(test_CheckQueue_UniqueCheck)
 {
-    auto queue = MakeUnique<Unique_Queue>(QUEUE_BATCH_SIZE);
+    auto queue = std::unique_ptr<Unique_Queue>(new Unique_Queue {QUEUE_BATCH_SIZE});
     boost::thread_group tg;
     for (auto x = 0; x < nScriptCheckThreads; ++x) {
        tg.create_thread([&]{queue->Thread();});
@@ -308,7 +310,7 @@ BOOST_AUTO_TEST_CASE(test_CheckQueue_UniqueCheck)
 // time could leave the data hanging across a sequence of blocks.
 BOOST_AUTO_TEST_CASE(test_CheckQueue_Memory)
 {
-    auto queue = MakeUnique<Memory_Queue>(QUEUE_BATCH_SIZE);
+    auto queue = std::unique_ptr<Memory_Queue>(new Memory_Queue {QUEUE_BATCH_SIZE});
     boost::thread_group tg;
     for (auto x = 0; x < nScriptCheckThreads; ++x) {
        tg.create_thread([&]{queue->Thread();});
@@ -339,7 +341,7 @@ BOOST_AUTO_TEST_CASE(test_CheckQueue_Memory)
 // have been destructed
 BOOST_AUTO_TEST_CASE(test_CheckQueue_FrozenCleanup)
 {
-    auto queue = MakeUnique<FrozenCleanup_Queue>(QUEUE_BATCH_SIZE);
+    auto queue = std::unique_ptr<FrozenCleanup_Queue>(new FrozenCleanup_Queue {QUEUE_BATCH_SIZE});
     boost::thread_group tg;
     bool fails = false;
     for (auto x = 0; x < nScriptCheckThreads; ++x) {
@@ -353,8 +355,7 @@ BOOST_AUTO_TEST_CASE(test_CheckQueue_FrozenCleanup)
         // would get called twice).
         vChecks[0].should_freeze = true;
         control.Add(vChecks);
-        bool waitResult = control.Wait(); // Hangs here
-        assert(waitResult);
+        control.Wait(); // Hangs here
     });
     {
         std::unique_lock<std::mutex> l(FrozenCleanupCheck::m);
@@ -383,7 +384,7 @@ BOOST_AUTO_TEST_CASE(test_CheckQueue_FrozenCleanup)
 /** Test that CCheckQueueControl is threadsafe */
 BOOST_AUTO_TEST_CASE(test_CheckQueueControl_Locks)
 {
-    auto queue = MakeUnique<Standard_Queue>(QUEUE_BATCH_SIZE);
+    auto queue = std::unique_ptr<Standard_Queue>(new Standard_Queue{QUEUE_BATCH_SIZE});
     {
         boost::thread_group tg;
         std::atomic<int> nThreads {0};

@@ -120,9 +120,9 @@ QT_MOC_CPP = \
   qt/moc_bantablemodel.cpp \
   qt/moc_diazaddressvalidator.cpp \
   qt/moc_diazamountfield.cpp \
-  qt/moc_diaz.cpp \
   qt/moc_diazgui.cpp \
   qt/moc_diazunits.cpp \
+  qt/moc_callback.cpp \
   qt/moc_clientmodel.cpp \
   qt/moc_coincontroldialog.cpp \
   qt/moc_coincontroltreewidget.cpp \
@@ -140,7 +140,6 @@ QT_MOC_CPP = \
   qt/moc_overviewpage.cpp \
   qt/moc_peertablemodel.cpp \
   qt/moc_paymentserver.cpp \
-  qt/moc_qrimagewidget.cpp \
   qt/moc_qvalidatedlineedit.cpp \
   qt/moc_qvaluecombobox.cpp \
   qt/moc_receivecoinsdialog.cpp \
@@ -158,18 +157,18 @@ QT_MOC_CPP = \
   qt/moc_transactiontablemodel.cpp \
   qt/moc_transactionview.cpp \
   qt/moc_utilitydialog.cpp \
-  qt/moc_walletcontroller.cpp \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
   qt/moc_walletview.cpp
 
 DIAZ_MM = \
   qt/macdockiconhandler.mm \
-  qt/macnotificationhandler.mm \
-  qt/macos_appnap.mm
+  qt/macnotificationhandler.mm
 
 QT_MOC = \
+  qt/diaz.moc \
   qt/diazamountfield.moc \
+  qt/callback.moc \
   qt/intro.moc \
   qt/overviewpage.moc \
   qt/rpcconsole.moc
@@ -179,15 +178,9 @@ QT_QRC = qt/diaz.qrc
 QT_QRC_LOCALE_CPP = qt/qrc_diaz_locale.cpp
 QT_QRC_LOCALE = qt/diaz_locale.qrc
 
-if ENABLE_BIP70
 PROTOBUF_CC = qt/paymentrequest.pb.cc
 PROTOBUF_H = qt/paymentrequest.pb.h
 PROTOBUF_PROTO = qt/paymentrequest.proto
-else
-PROTOBUF_CC =
-PROTOBUF_H =
-PROTOBUF_PROTO =
-endif
 
 DIAZ_QT_H = \
   qt/addressbookpage.h \
@@ -196,9 +189,9 @@ DIAZ_QT_H = \
   qt/bantablemodel.h \
   qt/diazaddressvalidator.h \
   qt/diazamountfield.h \
-  qt/diaz.h \
   qt/diazgui.h \
   qt/diazunits.h \
+  qt/callback.h \
   qt/clientmodel.h \
   qt/coincontroldialog.h \
   qt/coincontroltreewidget.h \
@@ -209,7 +202,6 @@ DIAZ_QT_H = \
   qt/intro.h \
   qt/macdockiconhandler.h \
   qt/macnotificationhandler.h \
-  qt/macos_appnap.h \
   qt/modaloverlay.h \
   qt/networkstyle.h \
   qt/notificator.h \
@@ -221,7 +213,6 @@ DIAZ_QT_H = \
   qt/paymentserver.h \
   qt/peertablemodel.h \
   qt/platformstyle.h \
-  qt/qrimagewidget.h \
   qt/qvalidatedlineedit.h \
   qt/qvaluecombobox.h \
   qt/receivecoinsdialog.h \
@@ -240,7 +231,6 @@ DIAZ_QT_H = \
   qt/transactiontablemodel.h \
   qt/transactionview.h \
   qt/utilitydialog.h \
-  qt/walletcontroller.h \
   qt/walletframe.h \
   qt/walletmodel.h \
   qt/walletmodeltransaction.h \
@@ -307,7 +297,6 @@ RES_ICONS = \
 
 DIAZ_QT_BASE_CPP = \
   qt/bantablemodel.cpp \
-  qt/diaz.cpp \
   qt/diazaddressvalidator.cpp \
   qt/diazamountfield.cpp \
   qt/diazgui.cpp \
@@ -341,8 +330,8 @@ DIAZ_QT_WALLET_CPP = \
   qt/editaddressdialog.cpp \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \
+  qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
-  qt/qrimagewidget.cpp \
   qt/receivecoinsdialog.cpp \
   qt/receiverequestdialog.cpp \
   qt/recentrequeststablemodel.cpp \
@@ -355,14 +344,10 @@ DIAZ_QT_WALLET_CPP = \
   qt/transactionrecord.cpp \
   qt/transactiontablemodel.cpp \
   qt/transactionview.cpp \
-  qt/walletcontroller.cpp \
   qt/walletframe.cpp \
   qt/walletmodel.cpp \
   qt/walletmodeltransaction.cpp \
   qt/walletview.cpp
-
-DIAZ_QT_WALLET_BIP70_CPP = \
-  qt/paymentrequestplus.cpp
 
 DIAZ_QT_CPP = $(DIAZ_QT_BASE_CPP)
 if TARGET_WINDOWS
@@ -370,10 +355,7 @@ DIAZ_QT_CPP += $(DIAZ_QT_WINDOWS_CPP)
 endif
 if ENABLE_WALLET
 DIAZ_QT_CPP += $(DIAZ_QT_WALLET_CPP)
-if ENABLE_BIP70
-DIAZ_QT_CPP += $(DIAZ_QT_WALLET_BIP70_CPP)
-endif # ENABLE_BIP70
-endif # ENABLE_WALLET
+endif
 
 RES_IMAGES =
 
@@ -390,9 +372,6 @@ qt_libdiazqt_a_OBJCXXFLAGS = $(AM_OBJCXXFLAGS) $(QT_PIE_FLAGS)
 
 qt_libdiazqt_a_SOURCES = $(DIAZ_QT_CPP) $(DIAZ_QT_H) $(QT_FORMS_UI) \
   $(QT_QRC) $(QT_QRC_LOCALE) $(QT_TS) $(PROTOBUF_PROTO) $(RES_ICONS) $(RES_IMAGES) $(RES_MOVIES)
-if TARGET_DARWIN
-  qt_libdiazqt_a_SOURCES += $(DIAZ_MM)
-endif
 
 nodist_qt_libdiazqt_a_SOURCES = $(QT_MOC_CPP) $(QT_MOC) $(PROTOBUF_CC) \
   $(PROTOBUF_H) $(QT_QRC_CPP) $(QT_QRC_LOCALE_CPP)
@@ -415,7 +394,10 @@ qt_diaz_qt_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(DIAZ_QT_INCLUDES) \
   $(QT_INCLUDES) $(PROTOBUF_CFLAGS) $(QR_CFLAGS)
 qt_diaz_qt_CXXFLAGS = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
 
-qt_diaz_qt_SOURCES = qt/main.cpp
+qt_diaz_qt_SOURCES = qt/diaz.cpp
+if TARGET_DARWIN
+  qt_diaz_qt_SOURCES += $(DIAZ_MM)
+endif
 if TARGET_WINDOWS
   qt_diaz_qt_SOURCES += $(DIAZ_RC)
 endif
@@ -427,16 +409,8 @@ if ENABLE_ZMQ
 qt_diaz_qt_LDADD += $(LIBDIAZ_ZMQ) $(ZMQ_LIBS)
 endif
 qt_diaz_qt_LDADD += $(LIBDIAZ_CLI) $(LIBDIAZ_COMMON) $(LIBDIAZ_UTIL) $(LIBDIAZ_CONSENSUS) $(LIBDIAZ_CRYPTO) $(LIBUNIVALUE) $(LIBLEVELDB) $(LIBLEVELDB_SSE42) $(LIBMEMENV) \
-  $(BOOST_LIBS) $(QT_LIBS) $(QT_DBUS_LIBS) $(QR_LIBS) $(PROTOBUF_LIBS) $(BDB_LIBS) $(MINIUPNPC_LIBS) $(LIBSECP256K1) \
+  $(BOOST_LIBS) $(QT_LIBS) $(QT_DBUS_LIBS) $(QR_LIBS) $(PROTOBUF_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(LIBSECP256K1) \
   $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
-if ENABLE_BIP70
-qt_diaz_qt_LDADD += $(SSL_LIBS)
-else
-if TARGET_WINDOWS
-qt_diaz_qt_LDADD += $(SSL_LIBS)
-endif
-endif
-qt_diaz_qt_LDADD += $(CRYPTO_LIBS)
 qt_diaz_qt_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(QT_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 qt_diaz_qt_LIBTOOLFLAGS = $(AM_LIBTOOLFLAGS) --tag CXX
 
@@ -447,7 +421,7 @@ SECONDARY: $(QT_QM)
 
 $(srcdir)/qt/diazstrings.cpp: $(libdiaz_server_a_SOURCES) $(libdiaz_wallet_a_SOURCES) $(libdiaz_common_a_SOURCES) $(libdiaz_zmq_a_SOURCES) $(libdiaz_consensus_a_SOURCES) $(libdiaz_util_a_SOURCES)
 	@test -n $(XGETTEXT) || echo "xgettext is required for updating translations"
-	$(AM_V_GEN) cd $(srcdir); XGETTEXT=$(XGETTEXT) COPYRIGHT_HOLDERS="$(COPYRIGHT_HOLDERS)" $(PYTHON) ../share/qt/extract_strings_qt.py $^
+	$(AM_V_GEN) cd $(srcdir); XGETTEXT=$(XGETTEXT) PACKAGE_NAME="$(PACKAGE_NAME)" COPYRIGHT_HOLDERS="$(COPYRIGHT_HOLDERS)" COPYRIGHT_HOLDERS_SUBSTITUTION="$(COPYRIGHT_HOLDERS_SUBSTITUTION)" $(PYTHON) ../share/qt/extract_strings_qt.py $^
 
 translate: $(srcdir)/qt/diazstrings.cpp $(QT_FORMS_UI) $(QT_FORMS_UI) $(DIAZ_QT_BASE_CPP) qt/diaz.cpp $(DIAZ_QT_WINDOWS_CPP) $(DIAZ_QT_WALLET_CPP) $(DIAZ_QT_H) $(DIAZ_MM)
 	@test -n $(LUPDATE) || echo "lupdate is required for updating translations"

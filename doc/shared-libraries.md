@@ -3,15 +3,15 @@ Shared Libraries
 
 ## diazconsensus
 
-The purpose of this library is to make the verification functionality that is critical to Bitcoin's consensus available to other applications, e.g. to language bindings.
+The purpose of this library is to make the verification functionality that is critical to Diaz's consensus available to other applications, e.g. to language bindings.
 
 ### API
 
-The interface is defined in the C header `diazconsensus.h` located in `src/script/diazconsensus.h`.
+The interface is defined in the C header `diazconsensus.h` located in  `src/script/diazconsensus.h`.
 
 #### Version
 
-`diazconsensus_version` returns an `unsigned int` with the API version *(currently `1`)*.
+`diazconsensus_version` returns an `unsigned int` with the API version *(currently at an experimental `0`)*.
 
 #### Script Validation
 
@@ -28,12 +28,12 @@ The interface is defined in the C header `diazconsensus.h` located in `src/scrip
 
 ##### Script Flags
 - `diazconsensus_SCRIPT_FLAGS_VERIFY_NONE`
-- `diazconsensus_SCRIPT_FLAGS_VERIFY_P2SH` - Evaluate P2SH ([BIP16](https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki)) subscripts
-- `diazconsensus_SCRIPT_FLAGS_VERIFY_DERSIG` - Enforce strict DER ([BIP66](https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki)) compliance
-- `diazconsensus_SCRIPT_FLAGS_VERIFY_NULLDUMMY` - Enforce NULLDUMMY ([BIP147](https://github.com/bitcoin/bips/blob/master/bip-0147.mediawiki))
-- `diazconsensus_SCRIPT_FLAGS_VERIFY_CHECKLOCKTIMEVERIFY` - Enable CHECKLOCKTIMEVERIFY ([BIP65](https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki))
-- `diazconsensus_SCRIPT_FLAGS_VERIFY_CHECKSEQUENCEVERIFY` - Enable CHECKSEQUENCEVERIFY ([BIP112](https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki))
-- `diazconsensus_SCRIPT_FLAGS_VERIFY_WITNESS` - Enable WITNESS ([BIP141](https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki))
+- `diazconsensus_SCRIPT_FLAGS_VERIFY_P2SH` - Evaluate P2SH ([BIP16](https://github.com/diaz/bips/blob/master/bip-0016.mediawiki)) subscripts
+- `diazconsensus_SCRIPT_FLAGS_VERIFY_DERSIG` - Enforce strict DER ([BIP66](https://github.com/diaz/bips/blob/master/bip-0066.mediawiki)) compliance
+- `diazconsensus_SCRIPT_FLAGS_VERIFY_NULLDUMMY` - Enforce NULLDUMMY ([BIP147](https://github.com/diaz/bips/blob/master/bip-0147.mediawiki))
+- `diazconsensus_SCRIPT_FLAGS_VERIFY_CHECKLOCKTIMEVERIFY` - Enable CHECKLOCKTIMEVERIFY ([BIP65](https://github.com/diaz/bips/blob/master/bip-0065.mediawiki))
+- `diazconsensus_SCRIPT_FLAGS_VERIFY_CHECKSEQUENCEVERIFY` - Enable CHECKSEQUENCEVERIFY ([BIP112](https://github.com/diaz/bips/blob/master/bip-0112.mediawiki))
+- `diazconsensus_SCRIPT_FLAGS_VERIFY_WITNESS` - Enable WITNESS ([BIP141](https://github.com/diaz/bips/blob/master/bip-0141.mediawiki))
 
 ##### Errors
 - `diazconsensus_ERR_OK` - No errors with input parameters *(see the return value of `diazconsensus_verify_script` for the verification status)*
@@ -43,7 +43,7 @@ The interface is defined in the C header `diazconsensus.h` located in `src/scrip
 - `diazconsensus_ERR_AMOUNT_REQUIRED` - Input amount is required if WITNESS is used
 
 ### Example Implementations
-- [NBitcoin](https://github.com/NicolasDorier/NBitcoin/blob/master/NBitcoin/Script.cs#L814) (.NET Bindings)
+- [NDiaz](https://github.com/NicolasDorier/NDiaz/blob/master/NDiaz/Script.cs#L814) (.NET Bindings)
 - [node-libdiazconsensus](https://github.com/bitpay/node-libdiazconsensus) (Node.js Bindings)
 - [java-libdiazconsensus](https://github.com/dexX7/java-libdiazconsensus) (Java Bindings)
 - [diazconsensus-php](https://github.com/Bit-Wasp/diazconsensus-php) (PHP Bindings)

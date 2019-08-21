@@ -83,7 +83,7 @@ SECP256K1_API jobjectArray JNICALL Java_org_diaz_NativeSecp256k1_secp256k1_1ecds
 
   secp256k1_ecdsa_signature sig[72];
 
-  int ret = secp256k1_ecdsa_sign(ctx, sig, data, secKey, NULL, NULL);
+  int ret = secp256k1_ecdsa_sign(ctx, sig, data, secKey, NULL, NULL );
 
   unsigned char outputSer[72];
   size_t outputLen = 72;
@@ -353,9 +353,7 @@ SECP256K1_API jobjectArray JNICALL Java_org_diaz_NativeSecp256k1_secp256k1_1ecdh
       ctx,
       nonce_res,
       &pubkey,
-      secdata,
-      NULL,
-      NULL
+      secdata
     );
   }
 

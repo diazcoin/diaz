@@ -3,15 +3,15 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Phải chuột để sửa địa chỉ hoặc nhãn</translation>
+        <translation>Phải chuột để edit address hoặc label</translation>
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>Tạo một địa chỉ mới</translation>
+        <translation>Create một address mới</translation>
     </message>
     <message>
         <source>&amp;New</source>
-        <translation>&amp;Mới</translation>
+        <translation>&amp;Tạo mới</translation>
     </message>
     <message>
         <source>Copy the currently selected address to the system clipboard</source>
@@ -232,7 +232,7 @@
     </message>
 </context>
 <context>
-    <name>DIAZGUI</name>
+    <name>DiazGUI</name>
     <message>
         <source>Sign &amp;message...</source>
         <translation>Chữ ký &amp;lời nhắn...</translation>
@@ -316,10 +316,6 @@
     <message>
         <source>Open &amp;URI...</source>
         <translation>Mở &amp;URI...</translation>
-    </message>
-    <message>
-        <source>Wallet:</source>
-        <translation>Ví tiền</translation>
     </message>
     <message>
         <source>Click to disable network activity.</source>
@@ -2265,7 +2261,7 @@
     </message>
     <message>
         <source>A message that was attached to the diaz: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Diaz network.</source>
-        <translation>Một tin nhắn được đính kèm với số diaz: URI mà sẽ được lưu giữ với transaction dành cho tài liệu tham khảo. Lưu ý: Tin nhắn này sẽ không được gửi thông qua diaz network.</translation>
+        <translation>Một tin nhắn được đính kèm với số diaz: URI mà sẽ được lưu giữ với transaction dành cho tài liệu tham khảo. Lưu ý: Tin nhắn này sẽ không được gửi thông qua Diaz network.</translation>
     </message>
     <message>
         <source>Pay To:</source>

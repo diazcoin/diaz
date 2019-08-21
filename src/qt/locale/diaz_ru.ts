@@ -337,10 +337,6 @@
     </context>
 <context>
     <name>ReceiveCoinsDialog</name>
-    <message>
-        <source>Clear</source>
-        <translation>Очистить</translation>
-    </message>
     </context>
 <context>
     <name>ReceiveRequestDialog</name>

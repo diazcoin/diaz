@@ -1,16 +1,15 @@
-// Copyright (c) 2012-2019 The Bitcoin Core developers
+// Copyright (c) 2012-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <rpc/server.h>
 #include <rpc/client.h>
-#include <rpc/util.h>
 
 #include <core_io.h>
-#include <init.h>
-#include <interfaces/chain.h>
-#include <test/setup_common.h>
-#include <util/time.h>
+#include <key_io.h>
+#include <netbase.h>
+
+#include <test/test_diaz.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
@@ -29,9 +28,10 @@ UniValue CallRPC(std::string args)
     request.strMethod = strMethod;
     request.params = RPCConvertValues(strMethod, vArgs);
     request.fHelp = false;
-    if (RPCIsInWarmup(nullptr)) SetRPCWarmupFinished();
+    BOOST_CHECK(tableRPC[strMethod]);
+    rpcfn_type method = tableRPC[strMethod]->actor;
     try {
-        UniValue result = tableRPC.execute(request);
+        UniValue result = (*method)(request);
         return result;
     }
     catch (const UniValue& objError) {
@@ -112,14 +112,10 @@ BOOST_AUTO_TEST_CASE(rpc_rawsign)
     std::string notsigned = r.get_str();
     std::string privkey1 = "\"KzsXybp9jX64P5ekX1KUxRQ79Jht9uzW7LorgwE65i5rWACL6LQe\"";
     std::string privkey2 = "\"Kyhdf5LuKTRx4ge69ybABsiUAWjVRK4XGxAKk2FQLp2HjGMy87Z4\"";
-    InitInterfaces interfaces;
-    interfaces.chain = interfaces::MakeChain();
-    g_rpc_interfaces = &interfaces;
     r = CallRPC(std::string("signrawtransactionwithkey ")+notsigned+" [] "+prevout);
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == false);
     r = CallRPC(std::string("signrawtransactionwithkey ")+notsigned+" ["+privkey1+","+privkey2+"] "+prevout);
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == true);
-    g_rpc_interfaces = nullptr;
 }
 
 BOOST_AUTO_TEST_CASE(rpc_createraw_op_return)

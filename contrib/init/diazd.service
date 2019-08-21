@@ -5,44 +5,20 @@
 # See "man systemd.service" for details.
 
 # Note that almost all daemon options could be specified in
-# /etc/diaz/diaz.conf, except for those explicitly specified as arguments
-# in ExecStart=
+# /etc/diaz/diaz.conf
 
 [Unit]
-Description=Bitcoin daemon
+Description=Diaz daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/diazd -daemon \
-                            -pid=/run/diazd/diazd.pid \
-                            -conf=/etc/diaz/diaz.conf \
-                            -datadir=/var/lib/diazd
-
-# Process management
-####################
-
+ExecStart=/usr/bin/diazd -daemon -conf=/etc/diaz/diaz.conf -pid=/run/diazd/diazd.pid
+# Creates /run/diazd owned by diaz
+RuntimeDirectory=diazd
+User=diaz
 Type=forking
 PIDFile=/run/diazd/diazd.pid
 Restart=on-failure
-
-# Directory creation and permissions
-####################################
-
-# Run as diaz:diaz
-User=diaz
-Group=diaz
-
-# /run/diazd
-RuntimeDirectory=diazd
-RuntimeDirectoryMode=0710
-
-# /etc/diaz
-ConfigurationDirectory=diaz
-ConfigurationDirectoryMode=0710
-
-# /var/lib/diazd
-StateDirectory=diazd
-StateDirectoryMode=0710
 
 # Hardening measures
 ####################

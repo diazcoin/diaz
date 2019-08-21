@@ -1,6 +1,5 @@
 ---
-name: "bitcoin-dmg-signer"
-distro: "ubuntu"
+name: "diaz-dmg-signer"
 suites:
 - "bionic"
 architectures:
@@ -8,13 +7,11 @@ architectures:
 packages:
 - "faketime"
 remotes:
-- "url": "https://github.com/bitcoin-core/bitcoin-detached-sigs.git"
+- "url": "https://github.com/diaz-core/diaz-detached-sigs.git"
   "dir": "signature"
 files:
-- "bitcoin-osx-unsigned.tar.gz"
+- "diaz-osx-unsigned.tar.gz"
 script: |
-  set -e -o pipefail
-
   WRAP_DIR=$HOME/wrapped
   mkdir -p ${WRAP_DIR}
   export PATH=`pwd`:$PATH
@@ -30,8 +27,8 @@ script: |
     chmod +x ${WRAP_DIR}/${prog}
   done
 
-  UNSIGNED=bitcoin-osx-unsigned.tar.gz
-  SIGNED=bitcoin-osx-signed.dmg
+  UNSIGNED=diaz-osx-unsigned.tar.gz
+  SIGNED=diaz-osx-signed.dmg
 
   tar -xf ${UNSIGNED}
   OSX_VOLNAME="$(cat osx_volname)"

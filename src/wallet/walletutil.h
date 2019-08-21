@@ -5,15 +5,11 @@
 #ifndef DIAZ_WALLET_WALLETUTIL_H
 #define DIAZ_WALLET_WALLETUTIL_H
 
-#include <fs.h>
-
-#include <vector>
+#include <chainparamsbase.h>
+#include <util.h>
 
 //! Get the path of the wallet directory.
 fs::path GetWalletDir();
-
-//! Get wallets in wallet directory.
-std::vector<fs::path> ListWalletDir();
 
 //! The WalletLocation class provides wallet information.
 class WalletLocation final

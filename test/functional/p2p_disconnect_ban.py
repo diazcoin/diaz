@@ -5,7 +5,7 @@
 """Test node disconnect and ban behavior"""
 import time
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -13,7 +13,7 @@ from test_framework.util import (
     wait_until,
 )
 
-class DisconnectBanTest(BitcoinTestFramework):
+class DisconnectBanTest(DiazTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
 
@@ -22,7 +22,7 @@ class DisconnectBanTest(BitcoinTestFramework):
 
         self.log.info("setban: successfully ban single IP address")
         assert_equal(len(self.nodes[1].getpeerinfo()), 2)  # node1 should have 2 connections to node0 at this point
-        self.nodes[1].setban(subnet="127.0.0.1", command="add")
+        self.nodes[1].setban("127.0.0.1", "add")
         wait_until(lambda: len(self.nodes[1].getpeerinfo()) == 0, timeout=10)
         assert_equal(len(self.nodes[1].getpeerinfo()), 0)  # all nodes must be disconnected at this point
         assert_equal(len(self.nodes[1].listbanned()), 1)

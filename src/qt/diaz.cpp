@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2019 The Bitcoin Core developers
+// Copyright (c) 2011-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,12 +6,11 @@
 #include <config/diaz-config.h>
 #endif
 
-#include <qt/diaz.h>
 #include <qt/diazgui.h>
 
 #include <chainparams.h>
-#include <fs.h>
 #include <qt/clientmodel.h>
+#include <fs.h>
 #include <qt/guiconstants.h>
 #include <qt/guiutil.h>
 #include <qt/intro.h>
@@ -24,19 +23,23 @@
 
 #ifdef ENABLE_WALLET
 #include <qt/paymentserver.h>
-#include <qt/walletcontroller.h>
 #include <qt/walletmodel.h>
-#endif // ENABLE_WALLET
+#endif
 
 #include <interfaces/handler.h>
 #include <interfaces/node.h>
-#include <noui.h>
+#include <rpc/server.h>
 #include <ui_interface.h>
 #include <uint256.h>
-#include <util/system.h>
-#include <util/threadnames.h>
+#include <util.h>
+#include <warnings.h>
+
+#include <walletinitinterface.h>
 
 #include <memory>
+#include <stdint.h>
+
+#include <boost/thread.hpp>
 
 #include <QApplication>
 #include <QDebug>
@@ -50,6 +53,9 @@
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
+#if QT_VERSION < 0x050400
+Q_IMPORT_PLUGIN(AccessibleFactory)
+#endif
 #if defined(QT_QPA_PLATFORM_XCB)
 Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
 #elif defined(QT_QPA_PLATFORM_WINDOWS)
@@ -63,6 +69,19 @@ Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 Q_DECLARE_METATYPE(bool*)
 Q_DECLARE_METATYPE(CAmount)
 Q_DECLARE_METATYPE(uint256)
+
+static void InitMessage(const std::string &message)
+{
+    LogPrintf("init message: %s\n", message);
+}
+
+/*
+   Translate string to current locale using Qt.
+ */
+static std::string Translate(const char* psz)
+{
+    return QCoreApplication::translate("diaz-core", psz).toStdString();
+}
 
 static QString GetLangTerritory()
 {
@@ -128,6 +147,101 @@ void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, cons
     }
 }
 
+/** Class encapsulating Diaz Core startup and shutdown.
+ * Allows running startup and shutdown in a different thread from the UI thread.
+ */
+class DiazCore: public QObject
+{
+    Q_OBJECT
+public:
+    explicit DiazCore(interfaces::Node& node);
+
+public Q_SLOTS:
+    void initialize();
+    void shutdown();
+
+Q_SIGNALS:
+    void initializeResult(bool success);
+    void shutdownResult();
+    void runawayException(const QString &message);
+
+private:
+    /// Pass fatal exception message to UI thread
+    void handleRunawayException(const std::exception *e);
+
+    interfaces::Node& m_node;
+};
+
+/** Main Diaz application object */
+class DiazApplication: public QApplication
+{
+    Q_OBJECT
+public:
+    explicit DiazApplication(interfaces::Node& node, int &argc, char **argv);
+    ~DiazApplication();
+
+#ifdef ENABLE_WALLET
+    /// Create payment server
+    void createPaymentServer();
+#endif
+    /// parameter interaction/setup based on rules
+    void parameterSetup();
+    /// Create options model
+    void createOptionsModel(bool resetSettings);
+    /// Create main window
+    void createWindow(const NetworkStyle *networkStyle);
+    /// Create splash screen
+    void createSplashScreen(const NetworkStyle *networkStyle);
+
+    /// Request core initialization
+    void requestInitialize();
+    /// Request core shutdown
+    void requestShutdown();
+
+    /// Get process return value
+    int getReturnValue() const { return returnValue; }
+
+    /// Get window identifier of QMainWindow (DiazGUI)
+    WId getMainWinId() const;
+
+    /// Setup platform style
+    void setupPlatformStyle();
+
+public Q_SLOTS:
+    void initializeResult(bool success);
+    void shutdownResult();
+    /// Handle runaway exceptions. Shows a message box with the problem and quits the program.
+    void handleRunawayException(const QString &message);
+    void addWallet(WalletModel* walletModel);
+    void removeWallet();
+
+Q_SIGNALS:
+    void requestedInitialize();
+    void requestedShutdown();
+    void stopThread();
+    void splashFinished(QWidget *window);
+
+private:
+    QThread *coreThread;
+    interfaces::Node& m_node;
+    OptionsModel *optionsModel;
+    ClientModel *clientModel;
+    DiazGUI *window;
+    QTimer *pollShutdownTimer;
+#ifdef ENABLE_WALLET
+    PaymentServer* paymentServer;
+    std::vector<WalletModel*> m_wallet_models;
+    std::unique_ptr<interfaces::Handler> m_handler_load_wallet;
+#endif
+    int returnValue;
+    const PlatformStyle *platformStyle;
+    std::unique_ptr<QWidget> shutdownWindow;
+
+    void startThread();
+};
+
+#include <qt/diaz.moc>
+
 DiazCore::DiazCore(interfaces::Node& node) :
     QObject(), m_node(node)
 {
@@ -144,7 +258,6 @@ void DiazCore::initialize()
     try
     {
         qDebug() << __func__ << ": Running initialization in thread";
-        util::ThreadRename("qt-init");
         bool rv = m_node.appInitMain();
         Q_EMIT initializeResult(rv);
     } catch (const std::exception& e) {
@@ -171,14 +284,18 @@ void DiazCore::shutdown()
 
 DiazApplication::DiazApplication(interfaces::Node& node, int &argc, char **argv):
     QApplication(argc, argv),
-    coreThread(nullptr),
+    coreThread(0),
     m_node(node),
-    optionsModel(nullptr),
-    clientModel(nullptr),
-    window(nullptr),
-    pollShutdownTimer(nullptr),
+    optionsModel(0),
+    clientModel(0),
+    window(0),
+    pollShutdownTimer(0),
+#ifdef ENABLE_WALLET
+    paymentServer(0),
+    m_wallet_models(),
+#endif
     returnValue(0),
-    platformStyle(nullptr)
+    platformStyle(0)
 {
     setQuitOnLastWindowClosed(false);
 }
@@ -201,17 +318,21 @@ DiazApplication::~DiazApplication()
     if(coreThread)
     {
         qDebug() << __func__ << ": Stopping thread";
-        coreThread->quit();
+        Q_EMIT stopThread();
         coreThread->wait();
         qDebug() << __func__ << ": Stopped thread";
     }
 
     delete window;
-    window = nullptr;
+    window = 0;
+#ifdef ENABLE_WALLET
+    delete paymentServer;
+    paymentServer = 0;
+#endif
     delete optionsModel;
-    optionsModel = nullptr;
+    optionsModel = 0;
     delete platformStyle;
-    platformStyle = nullptr;
+    platformStyle = 0;
 }
 
 #ifdef ENABLE_WALLET
@@ -228,25 +349,20 @@ void DiazApplication::createOptionsModel(bool resetSettings)
 
 void DiazApplication::createWindow(const NetworkStyle *networkStyle)
 {
-    window = new DiazGUI(m_node, platformStyle, networkStyle, nullptr);
+    window = new DiazGUI(m_node, platformStyle, networkStyle, 0);
 
     pollShutdownTimer = new QTimer(window);
-    connect(pollShutdownTimer, &QTimer::timeout, window, &DiazGUI::detectShutdown);
+    connect(pollShutdownTimer, SIGNAL(timeout()), window, SLOT(detectShutdown()));
 }
 
 void DiazApplication::createSplashScreen(const NetworkStyle *networkStyle)
 {
-    SplashScreen *splash = new SplashScreen(m_node, nullptr, networkStyle);
+    SplashScreen *splash = new SplashScreen(m_node, 0, networkStyle);
     // We don't hold a direct pointer to the splash screen after creation, but the splash
-    // screen will take care of deleting itself when finish() happens.
+    // screen will take care of deleting itself when slotFinish happens.
     splash->show();
-    connect(this, &DiazApplication::splashFinished, splash, &SplashScreen::finish);
-    connect(this, &DiazApplication::requestedShutdown, splash, &QWidget::close);
-}
-
-bool DiazApplication::baseInitialize()
-{
-    return m_node.baseInitialize();
+    connect(this, SIGNAL(splashFinished(QWidget*)), splash, SLOT(slotFinish(QWidget*)));
+    connect(this, SIGNAL(requestedShutdown()), splash, SLOT(close()));
 }
 
 void DiazApplication::startThread()
@@ -258,13 +374,14 @@ void DiazApplication::startThread()
     executor->moveToThread(coreThread);
 
     /*  communication to and from thread */
-    connect(executor, &DiazCore::initializeResult, this, &DiazApplication::initializeResult);
-    connect(executor, &DiazCore::shutdownResult, this, &DiazApplication::shutdownResult);
-    connect(executor, &DiazCore::runawayException, this, &DiazApplication::handleRunawayException);
-    connect(this, &DiazApplication::requestedInitialize, executor, &DiazCore::initialize);
-    connect(this, &DiazApplication::requestedShutdown, executor, &DiazCore::shutdown);
+    connect(executor, SIGNAL(initializeResult(bool)), this, SLOT(initializeResult(bool)));
+    connect(executor, SIGNAL(shutdownResult()), this, SLOT(shutdownResult()));
+    connect(executor, SIGNAL(runawayException(QString)), this, SLOT(handleRunawayException(QString)));
+    connect(this, SIGNAL(requestedInitialize()), executor, SLOT(initialize()));
+    connect(this, SIGNAL(requestedShutdown()), executor, SLOT(shutdown()));
     /*  make sure executor object is deleted in its own thread */
-    connect(coreThread, &QThread::finished, executor, &QObject::deleteLater);
+    connect(this, SIGNAL(stopThread()), executor, SLOT(deleteLater()));
+    connect(this, SIGNAL(stopThread()), coreThread, SLOT(quit()));
 
     coreThread->start();
 }
@@ -296,22 +413,50 @@ void DiazApplication::requestShutdown()
     qDebug() << __func__ << ": Requesting shutdown";
     startThread();
     window->hide();
-    // Must disconnect node signals otherwise current thread can deadlock since
-    // no event loop is running.
-    window->unsubscribeFromCoreSignals();
-    // Request node shutdown, which can interrupt long operations, like
-    // rescanning a wallet.
-    m_node.startShutdown();
-    // Unsetting the client model can cause the current thread to wait for node
-    // to complete an operation, like wait for a RPC execution to complate.
-    window->setClientModel(nullptr);
+    window->setClientModel(0);
     pollShutdownTimer->stop();
 
+#ifdef ENABLE_WALLET
+    window->removeAllWallets();
+    for (WalletModel *walletModel : m_wallet_models) {
+        delete walletModel;
+    }
+    m_wallet_models.clear();
+#endif
     delete clientModel;
-    clientModel = nullptr;
+    clientModel = 0;
+
+    m_node.startShutdown();
 
     // Request shutdown from core thread
     Q_EMIT requestedShutdown();
+}
+
+void DiazApplication::addWallet(WalletModel* walletModel)
+{
+#ifdef ENABLE_WALLET
+    window->addWallet(walletModel);
+
+    if (m_wallet_models.empty()) {
+        window->setCurrentWallet(walletModel->getWalletName());
+    }
+
+    connect(walletModel, SIGNAL(coinsSent(WalletModel*, SendCoinsRecipient, QByteArray)),
+        paymentServer, SLOT(fetchPaymentACK(WalletModel*, const SendCoinsRecipient&, QByteArray)));
+    connect(walletModel, SIGNAL(unload()), this, SLOT(removeWallet()));
+
+    m_wallet_models.push_back(walletModel);
+#endif
+}
+
+void DiazApplication::removeWallet()
+{
+#ifdef ENABLE_WALLET
+    WalletModel* walletModel = static_cast<WalletModel*>(sender());
+    m_wallet_models.erase(std::find(m_wallet_models.begin(), m_wallet_models.end(), walletModel));
+    window->removeWallet(walletModel);
+    walletModel->deleteLater();
+#endif
 }
 
 void DiazApplication::initializeResult(bool success)
@@ -322,49 +467,53 @@ void DiazApplication::initializeResult(bool success)
     if(success)
     {
         // Log this only after AppInitMain finishes, as then logging setup is guaranteed complete
-        qInfo() << "Platform customization:" << platformStyle->getName();
+        qWarning() << "Platform customization:" << platformStyle->getName();
+#ifdef ENABLE_WALLET
+        PaymentServer::LoadRootCAs();
+        paymentServer->setOptionsModel(optionsModel);
+#endif
+
         clientModel = new ClientModel(m_node, optionsModel);
         window->setClientModel(clientModel);
-#ifdef ENABLE_WALLET
-        if (WalletModel::isWalletEnabled()) {
-            m_wallet_controller = new WalletController(m_node, platformStyle, optionsModel, this);
-            window->setWalletController(m_wallet_controller);
-            if (paymentServer) {
-                paymentServer->setOptionsModel(optionsModel);
-#ifdef ENABLE_BIP70
-                PaymentServer::LoadRootCAs();
-                connect(m_wallet_controller, &WalletController::coinsSent, paymentServer, &PaymentServer::fetchPaymentACK);
-#endif
-            }
-        }
-#endif // ENABLE_WALLET
 
-        // If -min option passed, start window minimized (iconified) or minimized to tray
-        if (!gArgs.GetBoolArg("-min", false)) {
-            window->show();
-        } else if (clientModel->getOptionsModel()->getMinimizeToTray() && window->hasTrayIcon()) {
-            // do nothing as the window is managed by the tray icon
-        } else {
+#ifdef ENABLE_WALLET
+        m_handler_load_wallet = m_node.handleLoadWallet([this](std::unique_ptr<interfaces::Wallet> wallet) {
+            WalletModel* wallet_model = new WalletModel(std::move(wallet), m_node, platformStyle, optionsModel, nullptr);
+            // Fix wallet model thread affinity.
+            wallet_model->moveToThread(thread());
+            QMetaObject::invokeMethod(this, "addWallet", Qt::QueuedConnection, Q_ARG(WalletModel*, wallet_model));
+        });
+
+        for (auto& wallet : m_node.getWallets()) {
+            addWallet(new WalletModel(std::move(wallet), m_node, platformStyle, optionsModel));
+        }
+#endif
+
+        // If -min option passed, start window minimized.
+        if(gArgs.GetBoolArg("-min", false))
+        {
             window->showMinimized();
         }
-        Q_EMIT splashFinished();
-        Q_EMIT windowShown(window);
+        else
+        {
+            window->show();
+        }
+        Q_EMIT splashFinished(window);
 
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
         // diaz: URIs or payment requests:
-        if (paymentServer) {
-            connect(paymentServer, &PaymentServer::receivedPaymentRequest, window, &DiazGUI::handlePaymentRequest);
-            connect(window, &DiazGUI::receivedURI, paymentServer, &PaymentServer::handleURIOrFile);
-            connect(paymentServer, &PaymentServer::message, [this](const QString& title, const QString& message, unsigned int style) {
-                window->message(title, message, style);
-            });
-            QTimer::singleShot(100, paymentServer, &PaymentServer::uiReady);
-        }
+        connect(paymentServer, SIGNAL(receivedPaymentRequest(SendCoinsRecipient)),
+                         window, SLOT(handlePaymentRequest(SendCoinsRecipient)));
+        connect(window, SIGNAL(receivedURI(QString)),
+                         paymentServer, SLOT(handleURIOrFile(QString)));
+        connect(paymentServer, SIGNAL(message(QString,QString,unsigned int)),
+                         window, SLOT(message(QString,QString,unsigned int)));
+        QTimer::singleShot(100, paymentServer, SLOT(uiReady()));
 #endif
         pollShutdownTimer->start(200);
     } else {
-        Q_EMIT splashFinished(); // Make sure splash screen doesn't stick around during shutdown
+        Q_EMIT splashFinished(window); // Make sure splash screen doesn't stick around during shutdown
         quit(); // Exit first main loop invocation
     }
 }
@@ -376,7 +525,7 @@ void DiazApplication::shutdownResult()
 
 void DiazApplication::handleRunawayException(const QString &message)
 {
-    QMessageBox::critical(nullptr, "Runaway exception", DiazGUI::tr("A fatal error occurred. Diaz can no longer continue safely and will quit.") + QString("\n\n") + message);
+    QMessageBox::critical(0, "Runaway exception", DiazGUI::tr("A fatal error occurred. Diaz can no longer continue safely and will quit.") + QString("\n\n") + message);
     ::exit(EXIT_FAILURE);
 }
 
@@ -390,33 +539,24 @@ WId DiazApplication::getMainWinId() const
 
 static void SetupUIArgs()
 {
-#if defined(ENABLE_WALLET) && defined(ENABLE_BIP70)
-    gArgs.AddArg("-allowselfsignedrootcertificates", strprintf("Allow self signed root certificates (default: %u)", DEFAULT_SELFSIGNED_ROOTCERTS), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::GUI);
+#ifdef ENABLE_WALLET
+    gArgs.AddArg("-allowselfsignedrootcertificates", strprintf("Allow self signed root certificates (default: %u)", DEFAULT_SELFSIGNED_ROOTCERTS), true, OptionsCategory::GUI);
 #endif
-    gArgs.AddArg("-choosedatadir", strprintf("Choose data directory on startup (default: %u)", DEFAULT_CHOOSE_DATADIR), ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
-    gArgs.AddArg("-lang=<lang>", "Set language, for example \"de_DE\" (default: system locale)", ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
-    gArgs.AddArg("-min", "Start minimized", ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
-    gArgs.AddArg("-resetguisettings", "Reset all settings changed in the GUI", ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
-    gArgs.AddArg("-rootcertificates=<file>", "Set SSL root certificates for payment request (default: -system-)", ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
-    gArgs.AddArg("-splash", strprintf("Show splash screen on startup (default: %u)", DEFAULT_SPLASHSCREEN), ArgsManager::ALLOW_ANY, OptionsCategory::GUI);
-    gArgs.AddArg("-uiplatform", strprintf("Select platform to customize UI for (one of windows, macosx, other; default: %s)", DiazGUI::DEFAULT_UIPLATFORM), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::GUI);
+    gArgs.AddArg("-choosedatadir", strprintf("Choose data directory on startup (default: %u)", DEFAULT_CHOOSE_DATADIR), false, OptionsCategory::GUI);
+    gArgs.AddArg("-lang=<lang>", "Set language, for example \"de_DE\" (default: system locale)", false, OptionsCategory::GUI);
+    gArgs.AddArg("-min", "Start minimized", false, OptionsCategory::GUI);
+    gArgs.AddArg("-resetguisettings", "Reset all settings changed in the GUI", false, OptionsCategory::GUI);
+    gArgs.AddArg("-rootcertificates=<file>", "Set SSL root certificates for payment request (default: -system-)", false, OptionsCategory::GUI);
+    gArgs.AddArg("-splash", strprintf("Show splash screen on startup (default: %u)", DEFAULT_SPLASHSCREEN), false, OptionsCategory::GUI);
+    gArgs.AddArg("-uiplatform", strprintf("Select platform to customize UI for (one of windows, macosx, other; default: %s)", DiazGUI::DEFAULT_UIPLATFORM), true, OptionsCategory::GUI);
 }
 
-int GuiMain(int argc, char* argv[])
+#ifndef DIAZ_QT_TEST
+int main(int argc, char *argv[])
 {
-#ifdef WIN32
-    util::WinCmdLineArgs winArgs;
-    std::tie(argc, argv) = winArgs.get();
-#endif
     SetupEnvironment();
-    util::ThreadRename("main");
 
     std::unique_ptr<interfaces::Node> node = interfaces::MakeNode();
-
-    // Subscribe to global signals from core
-    std::unique_ptr<interfaces::Handler> handler_message_box = node->handleMessageBox(noui_ThreadSafeMessageBox);
-    std::unique_ptr<interfaces::Handler> handler_question = node->handleQuestion(noui_ThreadSafeQuestion);
-    std::unique_ptr<interfaces::Handler> handler_init_message = node->handleInitMessage(noui_InitMessage);
 
     // Do not refer to data directory yet, this can be overridden by Intro::pickDataDirectory
 
@@ -424,38 +564,36 @@ int GuiMain(int argc, char* argv[])
     Q_INIT_RESOURCE(diaz);
     Q_INIT_RESOURCE(diaz_locale);
 
+    DiazApplication app(*node, argc, argv);
+#if QT_VERSION > 0x050100
     // Generate high-dpi pixmaps
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 #if QT_VERSION >= 0x050600
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 #ifdef Q_OS_MAC
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
 
-    DiazApplication app(*node, argc, argv);
-
     // Register meta types used for QMetaObject::invokeMethod
     qRegisterMetaType< bool* >();
-#ifdef ENABLE_WALLET
-    qRegisterMetaType<WalletModel*>();
-#endif
     //   Need to pass name here as CAmount is a typedef (see http://qt-project.org/doc/qt-5/qmetatype.html#qRegisterMetaType)
     //   IMPORTANT if it is no longer a typedef use the normal variant above
     qRegisterMetaType< CAmount >("CAmount");
-    qRegisterMetaType< std::function<void()> >("std::function<void()>");
-    qRegisterMetaType<QMessageBox::Icon>("QMessageBox::Icon");
+    qRegisterMetaType< std::function<void(void)> >("std::function<void(void)>");
+#ifdef ENABLE_WALLET
+    qRegisterMetaType<WalletModel*>("WalletModel*");
+#endif
+
     /// 2. Parse command-line options. We do this after qt in order to show an error if there are problems parsing these
     // Command-line options take precedence:
     node->setupServerArgs();
     SetupUIArgs();
     std::string error;
     if (!node->parseParameters(argc, argv, error)) {
-        node->initError(strprintf("Error parsing command line arguments: %s\n", error));
-        // Create a message box, because the gui has neither been created nor has subscribed to core signals
-        QMessageBox::critical(nullptr, PACKAGE_NAME,
-            // message can not be translated because translations have not been initialized
-            QString::fromStdString("Error parsing command line arguments: %1.").arg(QString::fromStdString(error)));
+        QMessageBox::critical(0, QObject::tr(PACKAGE_NAME),
+            QObject::tr("Error parsing command line arguments: %1.").arg(QString::fromStdString(error)));
         return EXIT_FAILURE;
     }
 
@@ -473,6 +611,7 @@ int GuiMain(int argc, char* argv[])
     // Now that QSettings are accessible, initialize translations
     QTranslator qtTranslatorBase, qtTranslator, translatorBase, translator;
     initTranslations(qtTranslatorBase, qtTranslator, translatorBase, translator);
+    translationInterface.Translate.connect(Translate);
 
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
     // but before showing splash screen.
@@ -491,14 +630,12 @@ int GuiMain(int argc, char* argv[])
     /// - Do not call GetDataDir(true) before this step finishes
     if (!fs::is_directory(GetDataDir(false)))
     {
-        node->initError(strprintf("Specified data directory \"%s\" does not exist.\n", gArgs.GetArg("-datadir", "")));
-        QMessageBox::critical(nullptr, PACKAGE_NAME,
-            QObject::tr("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(gArgs.GetArg("-datadir", ""))));
+        QMessageBox::critical(0, QObject::tr(PACKAGE_NAME),
+                              QObject::tr("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(gArgs.GetArg("-datadir", ""))));
         return EXIT_FAILURE;
     }
     if (!node->readConfigFiles(error)) {
-        node->initError(strprintf("Error reading configuration file: %s\n", error));
-        QMessageBox::critical(nullptr, PACKAGE_NAME,
+        QMessageBox::critical(0, QObject::tr(PACKAGE_NAME),
             QObject::tr("Error: Cannot parse configuration file: %1.").arg(QString::fromStdString(error)));
         return EXIT_FAILURE;
     }
@@ -513,8 +650,7 @@ int GuiMain(int argc, char* argv[])
     try {
         node->selectParams(gArgs.GetChainName());
     } catch(std::exception &e) {
-        node->initError(strprintf("%s\n", e.what()));
-        QMessageBox::critical(nullptr, PACKAGE_NAME, QObject::tr("Error: %1").arg(e.what()));
+        QMessageBox::critical(0, QObject::tr(PACKAGE_NAME), QObject::tr("Error: %1").arg(e.what()));
         return EXIT_FAILURE;
     }
 #ifdef ENABLE_WALLET
@@ -541,10 +677,8 @@ int GuiMain(int argc, char* argv[])
 
     // Start up the payment server early, too, so impatient users that click on
     // diaz: links repeatedly have their payment requests routed to this process:
-    if (WalletModel::isWalletEnabled()) {
-        app.createPaymentServer();
-    }
-#endif // ENABLE_WALLET
+    app.createPaymentServer();
+#endif
 
     /// 9. Main GUI initialization
     // Install global event filter that makes sure that long tooltips can be word-wrapped
@@ -560,6 +694,9 @@ int GuiMain(int argc, char* argv[])
     // Load GUI settings from QSettings
     app.createOptionsModel(gArgs.GetBoolArg("-resetguisettings", false));
 
+    // Subscribe to global signals from core
+    std::unique_ptr<interfaces::Handler> handler = node->handleInitMessage(InitMessage);
+
     if (gArgs.GetBoolArg("-splash", DEFAULT_SPLASHSCREEN) && !gArgs.GetBoolArg("-min", false))
         app.createSplashScreen(networkStyle.data());
 
@@ -570,10 +707,10 @@ int GuiMain(int argc, char* argv[])
         // Perform base initialization before spinning up initialization/shutdown thread
         // This is acceptable because this function only contains steps that are quick to execute,
         // so the GUI thread won't be held up.
-        if (app.baseInitialize()) {
+        if (node->baseInitialize()) {
             app.requestInitialize();
 #if defined(Q_OS_WIN)
-            WinShutdownMonitor::registerShutdownBlockReason(QObject::tr("%1 didn't yet exit safely...").arg(PACKAGE_NAME), (HWND)app.getMainWinId());
+            WinShutdownMonitor::registerShutdownBlockReason(QObject::tr("%1 didn't yet exit safely...").arg(QObject::tr(PACKAGE_NAME)), (HWND)app.getMainWinId());
 #endif
             app.exec();
             app.requestShutdown();
@@ -592,3 +729,4 @@ int GuiMain(int argc, char* argv[])
     }
     return rv;
 }
+#endif // DIAZ_QT_TEST

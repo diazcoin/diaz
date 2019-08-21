@@ -74,21 +74,21 @@ public:
 
     /** Get requested URI.
      */
-    std::string GetURI() const;
+    std::string GetURI();
 
     /** Get CService (address:ip) for the origin of the http request.
      */
-    CService GetPeer() const;
+    CService GetPeer();
 
     /** Get request method.
      */
-    RequestMethod GetRequestMethod() const;
+    RequestMethod GetRequestMethod();
 
     /**
      * Get the request header specified by hdr, or an empty string.
      * Return a pair (isPresent,string).
      */
-    std::pair<bool, std::string> GetHeader(const std::string& hdr) const;
+    std::pair<bool, std::string> GetHeader(const std::string& hdr);
 
     /**
      * Read request body.
@@ -134,7 +134,7 @@ public:
      * deleteWhenTriggered deletes this event object after the event is triggered (and the handler called)
      * handler is the handler to call when the event is triggered.
      */
-    HTTPEvent(struct event_base* base, bool deleteWhenTriggered, const std::function<void()>& handler);
+    HTTPEvent(struct event_base* base, bool deleteWhenTriggered, const std::function<void(void)>& handler);
     ~HTTPEvent();
 
     /** Trigger the event. If tv is 0, trigger it immediately. Otherwise trigger it after
@@ -143,9 +143,11 @@ public:
     void trigger(struct timeval* tv);
 
     bool deleteWhenTriggered;
-    std::function<void()> handler;
+    std::function<void(void)> handler;
 private:
     struct event* ev;
 };
+
+std::string urlDecode(const std::string &urlEncoded);
 
 #endif // DIAZ_HTTPSERVER_H

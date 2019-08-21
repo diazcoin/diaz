@@ -7,8 +7,6 @@ clang-format-diff.py
 
 A script to format unified git diffs according to [.clang-format](../../src/.clang-format).
 
-Requires `clang-format`, installed e.g. via `brew install clang-format` on macOS.
-
 For instance, to format the last commit with 0 lines of context,
 the script should be called from the git root folder as follows.
 
@@ -19,7 +17,7 @@ git diff -U0 HEAD~1.. | ./contrib/devtools/clang-format-diff.py -p1 -i -v
 copyright\_header.py
 ====================
 
-Provides utilities for managing copyright headers of `The Bitcoin Core
+Provides utilities for managing copyright headers of `The Diaz Core
 developers` in repository source files. It has three subcommands:
 
 ```
@@ -99,7 +97,7 @@ For example:
   ./github-merge.py 3077
 
 (in any git repository) will help you merge pull request #3077 for the
-bitcoin/bitcoin repository.
+diaz/diaz repository.
 
 What it does:
 * Fetch master and the pull request.
@@ -117,34 +115,16 @@ couldn't mess with the sources.
 
 Setup
 ---------
-Configuring the github-merge tool for the bitcoin repository is done in the following way:
+Configuring the github-merge tool for the diaz repository is done in the following way:
 
-    git config githubmerge.repository bitcoin/bitcoin
+    git config githubmerge.repository diaz/diaz
     git config githubmerge.testcmd "make -j4 check" (adapt to whatever you want to use for testing)
-    git config --global user.signingkey mykeyid
-
-Authentication (optional)
---------------------------
-
-The API request limit for unauthenticated requests is quite low, but the
-limit for authenticated requests is much higher. If you start running
-into rate limiting errors it can be useful to set an authentication token
-so that the script can authenticate requests.
-
-- First, go to [Personal access tokens](https://github.com/settings/tokens).
-- Click 'Generate new token'.
-- Fill in an arbitrary token description. No further privileges are needed.
-- Click the `Generate token` button at the bottom of the form.
-- Copy the generated token (should be a hexadecimal string)
-
-Then do:
-
-    git config --global user.ghtoken "pasted token"
+    git config --global user.signingkey mykeyid (if you want to GPG sign)
 
 Create and verify timestamps of merge commits
 ---------------------------------------------
 To create or verify timestamps on the merge commits, install the OpenTimestamps
-client via `pip3 install opentimestamps-client`. Then, download the gpg wrapper
+client via `pip3 install opentimestamps-client`. Then, dowload the gpg wrapper
 `ots-git-gpg-wrapper.sh` and set it as git's `gpg.program`. See
 [the ots git integration documentation](https://github.com/opentimestamps/opentimestamps-client/blob/master/doc/git-integration.md#usage)
 for further details.
@@ -152,7 +132,7 @@ for further details.
 optimize-pngs.py
 ================
 
-A script to optimize png files in the bitcoin
+A script to optimize png files in the diaz
 repository (requires pngcrush).
 
 security-check.py and test-security-check.py
@@ -169,16 +149,16 @@ still compatible with the minimum supported Linux distribution versions.
 
 Example usage after a gitian build:
 
-    find ../gitian-builder/build -type f -executable | xargs python3 contrib/devtools/symbol-check.py
+    find ../gitian-builder/build -type f -executable | xargs python contrib/devtools/symbol-check.py 
 
 If only supported symbols are used the return value will be 0 and the output will be empty.
 
 If there are 'unsupported' symbols, the return value will be 1 a list like this will be printed:
 
-    .../64/test_bitcoin: symbol memcpy from unsupported version GLIBC_2.14
-    .../64/test_bitcoin: symbol __fdelt_chk from unsupported version GLIBC_2.15
-    .../64/test_bitcoin: symbol std::out_of_range::~out_of_range() from unsupported version GLIBCXX_3.4.15
-    .../64/test_bitcoin: symbol _ZNSt8__detail15_List_nod from unsupported version GLIBCXX_3.4.15
+    .../64/test_diaz: symbol memcpy from unsupported version GLIBC_2.14
+    .../64/test_diaz: symbol __fdelt_chk from unsupported version GLIBC_2.15
+    .../64/test_diaz: symbol std::out_of_range::~out_of_range() from unsupported version GLIBCXX_3.4.15
+    .../64/test_diaz: symbol _ZNSt8__detail15_List_nod from unsupported version GLIBCXX_3.4.15
 
 update-translations.py
 ======================

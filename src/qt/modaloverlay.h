@@ -45,7 +45,6 @@ private:
     QVector<QPair<qint64, double> > blockProcessTime;
     bool layerIsVisible;
     bool userClosed;
-    void UpdateHeaderSyncLabel();
 };
 
 #endif // DIAZ_QT_MODALOVERLAY_H

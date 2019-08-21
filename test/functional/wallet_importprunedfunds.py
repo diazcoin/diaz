@@ -5,13 +5,13 @@
 """Test the importprunedfunds and removeprunedfunds RPCs."""
 from decimal import Decimal
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
 )
 
-class ImportPrunedFundsTest(BitcoinTestFramework):
+class ImportPrunedFundsTest(DiazTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2
@@ -81,7 +81,7 @@ class ImportPrunedFundsTest(BitcoinTestFramework):
 
         # Import with affiliated address with no rescan
         self.nodes[1].importaddress(address=address2, rescan=False)
-        self.nodes[1].importprunedfunds(rawtransaction=rawtxn2, txoutproof=proof2)
+        self.nodes[1].importprunedfunds(rawtxn2, proof2)
         assert [tx for tx in self.nodes[1].listtransactions(include_watchonly=True) if tx['txid'] == txnid2]
 
         # Import with private key with no rescan

@@ -1,5 +1,6 @@
 # Linearize
-Construct a linear, no-fork, best version of the diaz blockchain.
+Construct a linear, no-fork, best version of the Diaz blockchain. The scripts
+run using Python 3 but are compatible with Python 2.
 
 ## Step 1: Download hash list
 

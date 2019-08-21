@@ -41,7 +41,6 @@ LIBDIAZCONSENSUS=libdiazconsensus.la
 endif
 if ENABLE_WALLET
 LIBDIAZ_WALLET=libdiaz_wallet.a
-LIBDIAZ_WALLET_TOOL=libdiaz_wallet_tool.a
 endif
 
 LIBDIAZ_CRYPTO= $(LIBDIAZ_CRYPTO_BASE)
@@ -71,7 +70,6 @@ EXTRA_LIBRARIES += \
   $(LIBDIAZ_SERVER) \
   $(LIBDIAZ_CLI) \
   $(LIBDIAZ_WALLET) \
-  $(LIBDIAZ_WALLET_TOOL) \
   $(LIBDIAZ_ZMQ)
 
 lib_LTLIBRARIES = $(LIBDIAZCONSENSUS)
@@ -85,16 +83,8 @@ if BUILD_DIAZD
   bin_PROGRAMS += diazd
 endif
 
-if BUILD_DIAZ_CLI
-  bin_PROGRAMS += diaz-cli
-endif
-if BUILD_DIAZ_TX
-  bin_PROGRAMS += diaz-tx
-endif
-if ENABLE_WALLET
-if BUILD_DIAZ_WALLET
-  bin_PROGRAMS += diaz-wallet
-endif
+if BUILD_DIAZ_UTILS
+  bin_PROGRAMS += diaz-cli diaz-tx
 endif
 
 .PHONY: FORCE check-symbols check-security
@@ -102,47 +92,41 @@ endif
 DIAZ_CORE_H = \
   addrdb.h \
   addrman.h \
-  attributes.h \
-  banman.h \
   base58.h \
   bech32.h \
   bloom.h \
   blockencodings.h \
-  blockfilter.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
   chainparamsseeds.h \
+  checkpoints.h \
   checkqueue.h \
   clientversion.h \
   coins.h \
   compat.h \
-  compat/assumptions.h \
   compat/byteswap.h \
   compat/endian.h \
   compat/sanity.h \
   compressor.h \
   consensus/consensus.h \
-  consensus/tx_check.h \
   consensus/tx_verify.h \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
-  flatfile.h \
   fs.h \
   httprpc.h \
   httpserver.h \
   index/base.h \
-  index/blockfilterindex.h \
   index/txindex.h \
   indirectmap.h \
   init.h \
-  interfaces/chain.h \
   interfaces/handler.h \
   interfaces/node.h \
   interfaces/wallet.h \
   key.h \
   key_io.h \
+  keystore.h \
   dbwrapper.h \
   limitedmap.h \
   logging.h \
@@ -154,37 +138,30 @@ DIAZ_CORE_H = \
   netaddress.h \
   netbase.h \
   netmessagemaker.h \
-  node/coin.h \
-  node/psbt.h \
-  node/transaction.h \
   noui.h \
-  optional.h \
   outputtype.h \
   policy/feerate.h \
   policy/fees.h \
   policy/policy.h \
   policy/rbf.h \
-  policy/settings.h \
   pow.h \
   protocol.h \
-  psbt.h \
   random.h \
   reverse_iterator.h \
   reverselock.h \
   rpc/blockchain.h \
   rpc/client.h \
+  rpc/mining.h \
   rpc/protocol.h \
-  rpc/rawtransaction_util.h \
-  rpc/register.h \
-  rpc/request.h \
   rpc/server.h \
+  rpc/rawtransaction.h \
+  rpc/register.h \
   rpc/util.h \
   scheduler.h \
   script/descriptor.h \
-  script/keyorigin.h \
+  script/ismine.h \
   script/sigcache.h \
   script/sign.h \
-  script/signingprovider.h \
   script/standard.h \
   shutdown.h \
   streams.h \
@@ -202,36 +179,22 @@ DIAZ_CORE_H = \
   txmempool.h \
   ui_interface.h \
   undo.h \
-  util/bip32.h \
-  util/bytevectorhash.h \
-  util/error.h \
-  util/fees.h \
-  util/system.h \
-  util/memory.h \
-  util/moneystr.h \
-  util/rbf.h \
-  util/threadnames.h \
-  util/time.h \
-  util/translation.h \
-  util/url.h \
-  util/validation.h \
+  util.h \
+  utilmemory.h \
+  utilmoneystr.h \
+  utiltime.h \
   validation.h \
   validationinterface.h \
   versionbits.h \
-  versionbitsinfo.h \
   walletinitinterface.h \
   wallet/coincontrol.h \
   wallet/crypter.h \
   wallet/db.h \
   wallet/feebumper.h \
   wallet/fees.h \
-  wallet/ismine.h \
-  wallet/load.h \
-  wallet/psbtwallet.h \
   wallet/rpcwallet.h \
   wallet/wallet.h \
   wallet/walletdb.h \
-  wallet/wallettool.h \
   wallet/walletutil.h \
   wallet/coinselection.h \
   warnings.h \
@@ -249,39 +212,31 @@ obj/build.h: FORCE
 libdiaz_util_a-clientversion.$(OBJEXT): obj/build.h
 
 # server: shared between diazd and diaz-qt
-# Contains code accessing mempool and chain state that is meant to be separated
-# from wallet and gui code (see node/README.md). Shared code should go in
-# libdiaz_common or libdiaz_util libraries, instead.
 libdiaz_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libdiaz_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libdiaz_server_a_SOURCES = \
   addrdb.cpp \
   addrman.cpp \
-  banman.cpp \
+  bloom.cpp \
   blockencodings.cpp \
-  blockfilter.cpp \
   chain.cpp \
+  checkpoints.cpp \
   consensus/tx_verify.cpp \
-  flatfile.cpp \
   httprpc.cpp \
   httpserver.cpp \
   index/base.cpp \
-  index/blockfilterindex.cpp \
   index/txindex.cpp \
-  interfaces/chain.cpp \
-  interfaces/node.cpp \
   init.cpp \
   dbwrapper.cpp \
+  merkleblock.cpp \
   miner.cpp \
   net.cpp \
   net_processing.cpp \
-  node/coin.cpp \
-  node/psbt.cpp \
-  node/transaction.cpp \
   noui.cpp \
+  outputtype.cpp \
   policy/fees.cpp \
+  policy/policy.cpp \
   policy/rbf.cpp \
-  policy/settings.cpp \
   pow.cpp \
   rest.cpp \
   rpc/blockchain.cpp \
@@ -290,6 +245,7 @@ libdiaz_server_a_SOURCES = \
   rpc/net.cpp \
   rpc/rawtransaction.cpp \
   rpc/server.cpp \
+  rpc/util.cpp \
   script/sigcache.cpp \
   shutdown.cpp \
   timedata.cpp \
@@ -302,15 +258,8 @@ libdiaz_server_a_SOURCES = \
   versionbits.cpp \
   $(DIAZ_CORE_H)
 
-if ENABLE_WALLET
-libdiaz_server_a_SOURCES += wallet/init.cpp
-endif
-if !ENABLE_WALLET
-libdiaz_server_a_SOURCES += dummywallet.cpp
-endif
-
 if ENABLE_ZMQ
-libdiaz_zmq_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES) $(ZMQ_CFLAGS)
+libdiaz_zmq_a_CPPFLAGS = $(DIAZ_INCLUDES) $(ZMQ_CFLAGS)
 libdiaz_zmq_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libdiaz_zmq_a_SOURCES = \
   zmq/zmqabstractnotifier.cpp \
@@ -331,9 +280,7 @@ libdiaz_wallet_a_SOURCES = \
   wallet/db.cpp \
   wallet/feebumper.cpp \
   wallet/fees.cpp \
-  wallet/ismine.cpp \
-  wallet/load.cpp \
-  wallet/psbtwallet.cpp \
+  wallet/init.cpp \
   wallet/rpcdump.cpp \
   wallet/rpcwallet.cpp \
   wallet/wallet.cpp \
@@ -342,31 +289,19 @@ libdiaz_wallet_a_SOURCES = \
   wallet/coinselection.cpp \
   $(DIAZ_CORE_H)
 
-libdiaz_wallet_tool_a_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-libdiaz_wallet_tool_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libdiaz_wallet_tool_a_SOURCES = \
-  wallet/wallettool.cpp \
-  $(DIAZ_CORE_H)
-
 # crypto primitives library
 crypto_libdiaz_crypto_base_a_CPPFLAGS = $(AM_CPPFLAGS)
 crypto_libdiaz_crypto_base_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 crypto_libdiaz_crypto_base_a_SOURCES = \
   crypto/aes.cpp \
   crypto/aes.h \
-  crypto/chacha_poly_aead.h \
-  crypto/chacha_poly_aead.cpp \
   crypto/chacha20.h \
   crypto/chacha20.cpp \
   crypto/common.h \
-  crypto/hkdf_sha256_32.cpp \
-  crypto/hkdf_sha256_32.h \
   crypto/hmac_sha256.cpp \
   crypto/hmac_sha256.h \
   crypto/hmac_sha512.cpp \
   crypto/hmac_sha512.h \
-  crypto/poly1305.h \
-  crypto/poly1305.cpp \
   crypto/ripemd160.cpp \
   crypto/ripemd160.h \
   crypto/sha1.cpp \
@@ -374,9 +309,7 @@ crypto_libdiaz_crypto_base_a_SOURCES = \
   crypto/sha256.cpp \
   crypto/sha256.h \
   crypto/sha512.cpp \
-  crypto/sha512.h \
-  crypto/siphash.cpp \
-  crypto/siphash.h
+  crypto/sha512.h
 
 if USE_ASM
 crypto_libdiaz_crypto_base_a_SOURCES += crypto/sha256_sse4.cpp
@@ -410,7 +343,6 @@ libdiaz_consensus_a_SOURCES = \
   consensus/merkle.cpp \
   consensus/merkle.h \
   consensus/params.h \
-  consensus/tx_check.cpp \
   consensus/validation.h \
   hash.cpp \
   hash.h \
@@ -433,8 +365,8 @@ libdiaz_consensus_a_SOURCES = \
   tinyformat.h \
   uint256.cpp \
   uint256.h \
-  util/strencodings.cpp \
-  util/strencodings.h \
+  utilstrencodings.cpp \
+  utilstrencodings.h \
   version.h
 
 # common: shared between diazd, and diaz-qt and non-server tools
@@ -443,7 +375,6 @@ libdiaz_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libdiaz_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
-  bloom.cpp \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
@@ -451,22 +382,16 @@ libdiaz_common_a_SOURCES = \
   core_write.cpp \
   key.cpp \
   key_io.cpp \
-  merkleblock.cpp \
+  keystore.cpp \
   netaddress.cpp \
   netbase.cpp \
-  outputtype.cpp \
   policy/feerate.cpp \
-  policy/policy.cpp \
   protocol.cpp \
-  psbt.cpp \
-  rpc/rawtransaction_util.cpp \
-  rpc/util.cpp \
   scheduler.cpp \
   script/descriptor.cpp \
+  script/ismine.cpp \
   script/sign.cpp \
-  script/signingprovider.cpp \
   script/standard.cpp \
-  versionbitsinfo.cpp \
   warnings.cpp \
   $(DIAZ_CORE_H)
 
@@ -484,24 +409,17 @@ libdiaz_util_a_SOURCES = \
   compat/strnlen.cpp \
   fs.cpp \
   interfaces/handler.cpp \
+  interfaces/node.cpp \
   logging.cpp \
   random.cpp \
-  rpc/request.cpp \
+  rpc/protocol.cpp \
   support/cleanse.cpp \
   sync.cpp \
   threadinterrupt.cpp \
-  util/bip32.cpp \
-  util/bytevectorhash.cpp \
-  util/error.cpp \
-  util/fees.cpp \
-  util/system.cpp \
-  util/moneystr.cpp \
-  util/rbf.cpp \
-  util/threadnames.cpp \
-  util/strencodings.cpp \
-  util/time.cpp \
-  util/url.cpp \
-  util/validation.cpp \
+  util.cpp \
+  utilmoneystr.cpp \
+  utilstrencodings.cpp \
+  utiltime.cpp \
   $(DIAZ_CORE_H)
 
 if GLIBC_BACK_COMPAT
@@ -529,12 +447,9 @@ if TARGET_WINDOWS
 diazd_SOURCES += diazd-res.rc
 endif
 
-# Libraries below may be listed more than once to resolve circular dependencies (see
-# https://eli.thegreenplace.net/2013/07/09/library-order-in-static-linking#circular-dependency)
 diazd_LDADD = \
   $(LIBDIAZ_SERVER) \
   $(LIBDIAZ_WALLET) \
-  $(LIBDIAZ_SERVER) \
   $(LIBDIAZ_COMMON) \
   $(LIBUNIVALUE) \
   $(LIBDIAZ_UTIL) \
@@ -546,7 +461,7 @@ diazd_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-diazd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+diazd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
 # diaz-cli binary #
 diaz_cli_SOURCES = diaz-cli.cpp
@@ -564,7 +479,7 @@ diaz_cli_LDADD = \
   $(LIBDIAZ_UTIL) \
   $(LIBDIAZ_CRYPTO)
 
-diaz_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+diaz_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # diaz-tx binary #
@@ -588,37 +503,10 @@ diaz_tx_LDADD = \
 diaz_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
-# diaz-wallet binary #
-diaz_wallet_SOURCES = diaz-wallet.cpp
-diaz_wallet_CPPFLAGS = $(AM_CPPFLAGS) $(DIAZ_INCLUDES)
-diaz_wallet_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-diaz_wallet_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
-
-if TARGET_WINDOWS
-diaz_wallet_SOURCES += diaz-wallet-res.rc
-endif
-
-diaz_wallet_LDADD = \
-  $(LIBDIAZ_WALLET_TOOL) \
-  $(LIBDIAZ_WALLET) \
-  $(LIBDIAZ_COMMON) \
-  $(LIBDIAZ_CONSENSUS) \
-  $(LIBDIAZ_UTIL) \
-  $(LIBDIAZ_CRYPTO) \
-  $(LIBDIAZ_ZMQ) \
-  $(LIBLEVELDB) \
-  $(LIBLEVELDB_SSE42) \
-  $(LIBMEMENV) \
-  $(LIBSECP256K1) \
-  $(LIBUNIVALUE)
-
-diaz_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
-#
-
 # diazconsensus library #
 if BUILD_DIAZ_LIBS
 include_HEADERS = script/diazconsensus.h
-libdiazconsensus_la_SOURCES = support/cleanse.cpp $(crypto_libdiaz_crypto_base_a_SOURCES) $(libdiaz_consensus_a_SOURCES)
+libdiazconsensus_la_SOURCES = $(crypto_libdiaz_crypto_base_a_SOURCES) $(libdiaz_consensus_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
   libdiazconsensus_la_SOURCES += compat/glibc_compat.cpp
@@ -679,20 +567,18 @@ clean-local:
 check-symbols: $(bin_PROGRAMS)
 if GLIBC_BACK_COMPAT
 	@echo "Checking glibc back compat..."
-	$(AM_V_at) READELF=$(READELF) CPPFILT=$(CPPFILT) $(PYTHON) $(top_srcdir)/contrib/devtools/symbol-check.py < $(bin_PROGRAMS)
+	$(AM_V_at) READELF=$(READELF) CPPFILT=$(CPPFILT) $(top_srcdir)/contrib/devtools/symbol-check.py < $(bin_PROGRAMS)
 endif
 
 check-security: $(bin_PROGRAMS)
 if HARDEN
 	@echo "Checking binary security..."
-	$(AM_V_at) READELF=$(READELF) OBJDUMP=$(OBJDUMP) $(PYTHON) $(top_srcdir)/contrib/devtools/security-check.py < $(bin_PROGRAMS)
+	$(AM_V_at) READELF=$(READELF) OBJDUMP=$(OBJDUMP) $(top_srcdir)/contrib/devtools/security-check.py < $(bin_PROGRAMS)
 endif
 
-if ENABLE_BIP70
 %.pb.cc %.pb.h: %.proto
 	@test -f $(PROTOC)
 	$(AM_V_GEN) $(PROTOC) --cpp_out=$(@D) --proto_path=$(<D) $<
-endif
 
 if EMBEDDED_LEVELDB
 include Makefile.leveldb.include

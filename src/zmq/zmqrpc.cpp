@@ -5,7 +5,6 @@
 #include <zmq/zmqrpc.h>
 
 #include <rpc/server.h>
-#include <rpc/util.h>
 #include <zmq/zmqabstractnotifier.h>
 #include <zmq/zmqnotificationinterface.h>
 
@@ -15,24 +14,23 @@ namespace {
 
 UniValue getzmqnotifications(const JSONRPCRequest& request)
 {
-            RPCHelpMan{"getzmqnotifications",
-                "\nReturns information about the active ZeroMQ notifications.\n",
-                {},
-                RPCResult{
+    if (request.fHelp || request.params.size() != 0) {
+        throw std::runtime_error(
+            "getzmqnotifications\n"
+            "\nReturns information about the active ZeroMQ notifications.\n"
+            "\nResult:\n"
             "[\n"
             "  {                        (json object)\n"
             "    \"type\": \"pubhashtx\",   (string) Type of notification\n"
-            "    \"address\": \"...\",      (string) Address of the publisher\n"
-            "    \"hwm\": n                 (numeric) Outbound message high water mark\n"
+            "    \"address\": \"...\"       (string) Address of the publisher\n"
             "  },\n"
             "  ...\n"
             "]\n"
-                },
-                RPCExamples{
-                    HelpExampleCli("getzmqnotifications", "")
+            "\nExamples:\n"
+            + HelpExampleCli("getzmqnotifications", "")
             + HelpExampleRpc("getzmqnotifications", "")
-                },
-            }.Check(request);
+        );
+    }
 
     UniValue result(UniValue::VARR);
     if (g_zmq_notification_interface != nullptr) {
@@ -40,7 +38,6 @@ UniValue getzmqnotifications(const JSONRPCRequest& request)
             UniValue obj(UniValue::VOBJ);
             obj.pushKV("type", n->GetType());
             obj.pushKV("address", n->GetAddress());
-            obj.pushKV("hwm", n->GetOutboundMessageHighWaterMark());
             result.push_back(obj);
         }
     }

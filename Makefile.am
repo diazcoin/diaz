@@ -20,7 +20,6 @@ DIAZD_BIN=$(top_builddir)/src/$(DIAZ_DAEMON_NAME)$(EXEEXT)
 DIAZ_QT_BIN=$(top_builddir)/src/qt/$(DIAZ_GUI_NAME)$(EXEEXT)
 DIAZ_CLI_BIN=$(top_builddir)/src/$(DIAZ_CLI_NAME)$(EXEEXT)
 DIAZ_TX_BIN=$(top_builddir)/src/$(DIAZ_TX_NAME)$(EXEEXT)
-DIAZ_WALLET_BIN=$(top_builddir)/src/$(DIAZ_WALLET_TOOL_NAME)$(EXEEXT)
 DIAZ_WIN_INSTALLER=$(PACKAGE)-$(PACKAGE_VERSION)-win$(WINDOWS_BITS)-setup$(EXEEXT)
 
 empty :=
@@ -43,7 +42,6 @@ DIST_DOCS = $(wildcard doc/*.md) $(wildcard doc/release-notes/*.md)
 DIST_CONTRIB = $(top_srcdir)/contrib/diaz-cli.bash-completion \
 	       $(top_srcdir)/contrib/diaz-tx.bash-completion \
 	       $(top_srcdir)/contrib/diazd.bash-completion \
-	       $(top_srcdir)/contrib/debian/copyright \
 	       $(top_srcdir)/contrib/init \
 	       $(top_srcdir)/contrib/install_db4.sh
 DIST_SHARE = \
@@ -78,7 +76,6 @@ $(DIAZ_WIN_INSTALLER): all-recursive
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(DIAZ_QT_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(DIAZ_CLI_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(DIAZ_TX_BIN) $(top_builddir)/release
-	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(DIAZ_WALLET_BIN) $(top_builddir)/release
 	@test -f $(MAKENSIS) && $(MAKENSIS) -V2 $(top_builddir)/share/setup.nsi || \
 	  echo error: could not build $@
 	@echo built $@
@@ -175,11 +172,8 @@ $(DIAZ_CLI_BIN): FORCE
 $(DIAZ_TX_BIN): FORCE
 	$(MAKE) -C src $(@F)
 
-$(DIAZ_WALLET_BIN): FORCE
-	$(MAKE) -C src $(@F)
-
 if USE_LCOV
-LCOV_FILTER_PATTERN=-p "/usr/include/" -p "/usr/lib/" -p "src/leveldb/" -p "src/bench/" -p "src/univalue" -p "src/crypto/ctaes" -p "src/secp256k1"
+LCOV_FILTER_PATTERN=-p "/usr/include/" -p "src/leveldb/" -p "src/bench/" -p "src/univalue" -p "src/crypto/ctaes" -p "src/secp256k1"
 
 baseline.info:
 	$(LCOV) -c -i -d $(abs_builddir)/src -o $@
@@ -198,7 +192,7 @@ test_diaz_filtered.info: test_diaz.info
 	$(LCOV) -a $@ $(LCOV_OPTS) -o $@
 
 functional_test.info: test_diaz_filtered.info
-	@TIMEOUT=15 test/functional/test_runner.py $(EXTENDED_FUNCTIONAL_TESTS)
+	-@TIMEOUT=15 test/functional/test_runner.py $(EXTENDED_FUNCTIONAL_TESTS)
 	$(LCOV) -c $(LCOV_OPTS) -d $(abs_builddir)/src --t functional-tests -o $@
 	$(LCOV) -z $(LCOV_OPTS) -d $(abs_builddir)/src
 
@@ -226,11 +220,7 @@ endif
 
 dist_noinst_SCRIPTS = autogen.sh
 
-EXTRA_DIST = $(DIST_SHARE) $(DIST_CONTRIB) $(DIST_DOCS) $(WINDOWS_PACKAGING) $(OSX_PACKAGING) $(BIN_CHECKS)
-
-EXTRA_DIST += \
-    test/functional \
-    test/fuzz
+EXTRA_DIST = $(DIST_SHARE) test/functional/test_runner.py test/functional $(DIST_CONTRIB) $(DIST_DOCS) $(WINDOWS_PACKAGING) $(OSX_PACKAGING) $(BIN_CHECKS)
 
 EXTRA_DIST += \
     test/util/diaz-util-test.py \
@@ -309,5 +299,5 @@ clean-docs:
 
 clean-local: clean-docs
 	rm -rf coverage_percent.txt test_diaz.coverage/ total.coverage/ test/tmp/ cache/ $(OSX_APP)
-	rm -rf test/functional/__pycache__ test/functional/test_framework/__pycache__ test/cache share/rpcauth/__pycache__
+	rm -rf test/functional/__pycache__ test/functional/test_framework/__pycache__ test/cache
 

@@ -18,8 +18,8 @@ DIAZD_BIN=${DIAZD_BIN:-/usr/bin/diazd}
 DIAZD_NICE=${DIAZD_NICE:-${NICELEVEL:-0}}
 DIAZD_OPTS="${DIAZD_OPTS:-${DIAZ_OPTS}}"
 
-name="Bitcoin Core Daemon"
-description="Bitcoin cryptocurrency P2P network daemon"
+name="Diaz Core Daemon"
+description="Diaz cryptocurrency P2P network daemon"
 
 command="/usr/bin/diazd"
 command_args="-pid=\"${DIAZD_PIDFILE}\" \
@@ -84,7 +84,7 @@ checkconfig()
 		eerror "It is recommended that you also set alertnotify so you are "
 		eerror "notified of problems:"
 		eerror ""
-		eerror "ie: alertnotify=echo %%s | mail -s \"Bitcoin Alert\"" \
+		eerror "ie: alertnotify=echo %%s | mail -s \"Diaz Alert\"" \
 			"admin@foo.com"
 		eerror ""
 		return 1

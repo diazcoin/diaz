@@ -6,14 +6,17 @@
 
 import os
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.test_node import ErrorMatch
 
 
-class LoggingTest(BitcoinTestFramework):
+class LoggingTest(DiazTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.setup_clean_chain = True
+
+    def skip_test_if_missing_module(self):
+        self.skip_if_no_wallet()
 
     def relative_log_path(self, name):
         return os.path.join(self.nodes[0].datadir, "regtest", name)

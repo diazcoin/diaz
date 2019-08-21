@@ -7,10 +7,11 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 /**
  * CBaseChainParams defines the base parameters (shared between diaz-cli and diazd)
- * of a given instance of the Bitcoin system.
+ * of a given instance of the Diaz system.
  */
 class CBaseChainParams
 {

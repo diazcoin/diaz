@@ -31,7 +31,6 @@ class QAbstractItemView;
 class QDateTime;
 class QFont;
 class QLineEdit;
-class QProgressDialog;
 class QUrl;
 class QWidget;
 QT_END_NAMESPACE
@@ -78,11 +77,6 @@ namespace GUIUtil
     QList<QModelIndex> getEntryData(QAbstractItemView *view, int column);
 
     void setClipboard(const QString& str);
-
-    /**
-     * Determine default data directory for operating system.
-     */
-    QString getDefaultDataDirectory();
 
     /** Get save filename, mimics QFileDialog::getSaveFileName, except that it appends a default suffix
         when no suffix is provided by the user.
@@ -139,7 +133,7 @@ namespace GUIUtil
         Q_OBJECT
 
     public:
-        explicit ToolTipToRichTextFilter(int size_threshold, QObject *parent = nullptr);
+        explicit ToolTipToRichTextFilter(int size_threshold, QObject *parent = 0);
 
     protected:
         bool eventFilter(QObject *obj, QEvent *evt);
@@ -254,9 +248,6 @@ namespace GUIUtil
     private:
         bool eventFilter(QObject *object, QEvent *event);
     };
-
-    // Fix known bugs in QProgressDialog class.
-    void PolishProgressDialog(QProgressDialog* dialog);
 } // namespace GUIUtil
 
 #endif // DIAZ_QT_GUIUTIL_H

@@ -4,6 +4,8 @@
 
 #include <qt/platformstyle.h>
 
+#include <qt/guiconstants.h>
+
 #include <QApplication>
 #include <QColor>
 #include <QImage>
@@ -137,6 +139,6 @@ const PlatformStyle *PlatformStyle::instantiate(const QString &platformId)
                     platform_styles[x].useExtraSpacing);
         }
     }
-    return nullptr;
+    return 0;
 }
 

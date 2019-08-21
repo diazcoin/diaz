@@ -6,12 +6,12 @@
 
 import re
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.test_node import ErrorMatch
 from test_framework.util import assert_equal
 
 
-class UacommentTest(BitcoinTestFramework):
+class UacommentTest(DiazTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.setup_clean_chain = True
@@ -31,7 +31,7 @@ class UacommentTest(BitcoinTestFramework):
         self.nodes[0].assert_start_raises_init_error(["-uacomment=" + 'a' * 256], expected, match=ErrorMatch.FULL_REGEX)
 
         self.log.info("test -uacomment unsafe characters")
-        for unsafe_char in ['/', ':', '(', ')', '₿', '🏃']:
+        for unsafe_char in ['/', ':', '(', ')']:
             expected = "Error: User Agent comment \(" + re.escape(unsafe_char) + "\) contains unsafe characters."
             self.nodes[0].assert_start_raises_init_error(["-uacomment=" + unsafe_char], expected, match=ErrorMatch.FULL_REGEX)
 

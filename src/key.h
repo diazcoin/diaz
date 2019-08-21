@@ -98,9 +98,6 @@ public:
     //! Generate a new private key using a cryptographic PRNG.
     void MakeNewKey(bool fCompressed);
 
-    //! Negate private key
-    bool Negate();
-
     /**
      * Convert the private key to a CPrivKey (serialized OpenSSL private key data).
      * This is expensive.
@@ -184,12 +181,12 @@ struct CExtKey {
 };
 
 /** Initialize the elliptic curve support. May not be called twice without calling ECC_Stop first. */
-void ECC_Start();
+void ECC_Start(void);
 
 /** Deinitialize the elliptic curve support. No-op if ECC_Start wasn't called first. */
-void ECC_Stop();
+void ECC_Stop(void);
 
 /** Check that required EC support is available at runtime. */
-bool ECC_InitSanityCheck();
+bool ECC_InitSanityCheck(void);
 
 #endif // DIAZ_KEY_H

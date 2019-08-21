@@ -6,6 +6,7 @@
 #ifndef DIAZ_TEST_SCRIPTNUM10_H
 #define DIAZ_TEST_SCRIPTNUM10_H
 
+#include <algorithm>
 #include <limits>
 #include <stdexcept>
 #include <stdint.h>
@@ -22,7 +23,7 @@ public:
 class CScriptNum10
 {
 /**
- * The ScriptNum implementation from Bitcoin Core 0.10.0, for cross-comparison.
+ * The ScriptNum implementation from Diaz Core 0.10.0, for cross-comparison.
  */
 public:
 

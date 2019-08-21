@@ -3,7 +3,7 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>לחץ על הכפתור הימני בעכבר כדי לערוך את הכתובת או התווית</translation>
+        <translation>יש ללחוץ על הכפתור הימני כדי לערוך כתובת או תווית</translation>
     </message>
     <message>
         <source>Create a new address</source>
@@ -279,19 +279,19 @@
     </message>
     <message>
         <source>&amp;About %1</source>
-        <translation>&amp;אודות %1</translation>
+        <translation>על &amp;אודות %1</translation>
     </message>
     <message>
         <source>Show information about %1</source>
-        <translation>הצג מידע על %1</translation>
+        <translation>הצגת מידע על %1</translation>
     </message>
     <message>
         <source>About &amp;Qt</source>
-        <translation>אודות &amp;Qt</translation>
+        <translation>על אודות Qt</translation>
     </message>
     <message>
         <source>Show information about Qt</source>
-        <translation>הצג מידע על Qt</translation>
+        <translation>הצגת מידע על Qt</translation>
     </message>
     <message>
         <source>&amp;Options...</source>
@@ -815,7 +815,7 @@
     </message>
     <message>
         <source>About %1</source>
-        <translation>אודות %1</translation>
+        <translation>על אודות %1</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1000,14 +1000,6 @@
     <message>
         <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
         <translation>כתובת ה־IP של המתווך (לדוגמה IPv4: 127.0.0.1‏ / IPv6: ::1)</translation>
-    </message>
-    <message>
-        <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
-        <translation>מראה אם פרוקסי SOCKS5 המסופק כבררת מחדל משמש להתקשרות עם עמיתים באמצעות סוג רשת זה.</translation>
-    </message>
-    <message>
-        <source>Use separate SOCKS&amp;5 proxy to reach peers via Tor hidden services:</source>
-        <translation>השתמשו בפרוקסי SOCKS&amp;5 נפרד כדי להתקשר עם עמיתים באמצעות שירותים חבויים ברשת Tor:</translation>
     </message>
     <message>
         <source>Hide the icon from the system tray.</source>
@@ -1564,7 +1556,7 @@
     </message>
     <message>
         <source>Client version</source>
-        <translation>גרסה</translation>
+        <translation>גרסת מנשק</translation>
     </message>
     <message>
         <source>&amp;Information</source>
@@ -1580,7 +1572,7 @@
     </message>
     <message>
         <source>Using BerkeleyDB version</source>
-        <translation>גרסת BerkeleyDB</translation>
+        <translation>שימוש ב־BerkeleyDB גרסה</translation>
     </message>
     <message>
         <source>Datadir</source>
@@ -1681,10 +1673,6 @@
     <message>
         <source>User Agent</source>
         <translation>סוכן משתמש</translation>
-    </message>
-    <message>
-        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>פתחו את לוג ניפוי השגיאות ה%1 מתיקיית הנתונים הנוכחית. עבור קבצי לוג גדולים ייתכן זמן המתנה של מספר שניות.</translation>
     </message>
     <message>
         <source>Decrease font size</source>
@@ -2213,10 +2201,6 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     <message>
         <source>Copy change</source>
         <translation>העתקת השינוי</translation>
-    </message>
-    <message>
-        <source>%1 (%2 blocks)</source>
-        <translation>%1 (%2 בלוקים)</translation>
     </message>
     <message>
         <source>Are you sure you want to send?</source>

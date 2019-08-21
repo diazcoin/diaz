@@ -37,16 +37,19 @@ static const bool DEFAULT_SPLASHSCREEN = true;
  */
 static const int TOOLTIP_WRAP_THRESHOLD = 80;
 
+/* Maximum allowed URI length */
+static const int MAX_URI_LENGTH = 255;
+
+/* QRCodeDialog -- size of exported QR Code image */
+#define QR_IMAGE_SIZE 300
+
 /* Number of frames in spinner animation */
 #define SPINNER_FRAMES 36
 
 #define QAPP_ORG_NAME "Diaz"
-#define QAPP_ORG_DOMAIN "diaz.org"
+#define QAPP_ORG_DOMAIN "diazwallet.online"
 #define QAPP_APP_NAME_DEFAULT "Diaz-Qt"
 #define QAPP_APP_NAME_TESTNET "Diaz-Qt-testnet"
 #define QAPP_APP_NAME_REGTEST "Diaz-Qt-regtest"
-
-/* One gigabyte (GB) in bytes */
-static constexpr uint64_t GB_BYTES{1000000000};
 
 #endif // DIAZ_QT_GUICONSTANTS_H

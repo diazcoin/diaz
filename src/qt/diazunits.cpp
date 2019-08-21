@@ -4,6 +4,8 @@
 
 #include <qt/diazunits.h>
 
+#include <primitives/transaction.h>
+
 #include <QStringList>
 
 DiazUnits::DiazUnits(QObject *parent):

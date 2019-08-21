@@ -1,13 +1,13 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: Bitcoin
+Upstream-Name: Diaz
 Upstream-Contact: Satoshi Nakamoto <satoshin@gmx.com>
  irc://#diaz@freenode.net
-Source: https://github.com/bitcoin/diaz
+Source: https://github.com/diaz/diaz
 
 Files: *
-Copyright: 2009-2019, Bitcoin Core Developers
+Copyright: 2009-2018, Diaz Core Developers
 License: Expat
-Comment: The Bitcoin Core Developers encompasses the current developers listed on bitcoin.org,
+Comment: The Diaz Core Developers encompasses the current developers listed on diazwallet.online,
          as well as the numerous contributors to the project.
 
 Files: debian/*
@@ -91,12 +91,12 @@ Files: src/qt/res/icons/about.png
        src/qt/res/src/diaz.svg
 Copyright: Bitboy, Jonas Schnelli
 License: public-domain
-Comment: Site: https://bitcointalk.org/?topic=1756.0
+Comment: Site: https://diaztalk.org/?topic=1756.0
 
 Files: src/qt/res/icons/proxy.png
        src/qt/res/src/proxy.svg
 Copyright: Cristian Mircea Messel
-License: public-domain
+Licese: public-domain
 
 
 License: Expat

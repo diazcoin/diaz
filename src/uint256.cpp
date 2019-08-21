@@ -5,7 +5,7 @@
 
 #include <uint256.h>
 
-#include <util/strencodings.h>
+#include <utilstrencodings.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -29,23 +29,24 @@ void base_blob<BITS>::SetHex(const char* psz)
     memset(data, 0, sizeof(data));
 
     // skip leading spaces
-    while (IsSpace(*psz))
+    while (isspace(*psz))
         psz++;
 
     // skip 0x
-    if (psz[0] == '0' && ToLower(psz[1]) == 'x')
+    if (psz[0] == '0' && tolower(psz[1]) == 'x')
         psz += 2;
 
     // hex string to uint
-    size_t digits = 0;
-    while (::HexDigit(psz[digits]) != -1)
-        digits++;
+    const char* pbegin = psz;
+    while (::HexDigit(*psz) != -1)
+        psz++;
+    psz--;
     unsigned char* p1 = (unsigned char*)data;
     unsigned char* pend = p1 + WIDTH;
-    while (digits > 0 && p1 < pend) {
-        *p1 = ::HexDigit(psz[--digits]);
-        if (digits > 0) {
-            *p1 |= ((unsigned char)::HexDigit(psz[--digits]) << 4);
+    while (psz >= pbegin && p1 < pend) {
+        *p1 = ::HexDigit(*psz--);
+        if (psz >= pbegin) {
+            *p1 |= ((unsigned char)::HexDigit(*psz--) << 4);
             p1++;
         }
     }

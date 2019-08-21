@@ -16,8 +16,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Bitcoin"
-            VALUE "FileDescription",    "diaz-tx (CLI Bitcoin transaction editor utility)"
+            VALUE "CompanyName",        "Diaz"
+            VALUE "FileDescription",    "diaz-tx (CLI Diaz transaction editor utility)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "diaz-tx"
             VALUE "LegalCopyright",     COPYRIGHT_STR

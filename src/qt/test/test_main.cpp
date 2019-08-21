@@ -6,25 +6,23 @@
 #include <config/diaz-config.h>
 #endif
 
-#include <interfaces/node.h>
-#include <qt/diaz.h>
-#include <qt/test/apptests.h>
+#include <chainparams.h>
 #include <qt/test/rpcnestedtests.h>
+#include <util.h>
 #include <qt/test/uritests.h>
 #include <qt/test/compattests.h>
-#include <test/setup_common.h>
 
 #ifdef ENABLE_WALLET
 #include <qt/test/addressbooktests.h>
-#ifdef ENABLE_BIP70
 #include <qt/test/paymentservertests.h>
-#endif // ENABLE_BIP70
 #include <qt/test/wallettests.h>
-#endif // ENABLE_WALLET
+#endif
 
 #include <QApplication>
 #include <QObject>
 #include <QTest>
+
+#include <openssl/ssl.h>
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
@@ -40,20 +38,19 @@ Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 #endif
 #endif
 
+extern void noui_connect();
+
 // This is all you need to run all the tests
 int main(int argc, char *argv[])
 {
-    // Initialize persistent globals with the testing setup state for sanity.
-    // E.g. -datadir in gArgs is set to a temp directory dummy value (instead
-    // of defaulting to the default datadir), or globalChainParams is set to
-    // regtest params.
-    //
-    // All tests must use their own testing setup (if needed).
-    {
-        BasicTestingSetup dummy{CBaseChainParams::REGTEST};
-    }
-
-    auto node = interfaces::MakeNode();
+    SetupEnvironment();
+    SetupNetworking();
+    SelectParams(CBaseChainParams::MAIN);
+    noui_connect();
+    ClearDatadirCache();
+    fs::path pathTemp = fs::temp_directory_path() / strprintf("test_diaz-qt_%lu_%i", (unsigned long)GetTime(), (int)GetRand(100000));
+    fs::create_directories(pathTemp);
+    gArgs.ForceSetArg("-datadir", pathTemp.string());
 
     bool fInvalid = false;
 
@@ -68,18 +65,16 @@ int main(int argc, char *argv[])
 
     // Don't remove this, it's needed to access
     // QApplication:: and QCoreApplication:: in the tests
-    DiazApplication app(*node, argc, argv);
+    QApplication app(argc, argv);
     app.setApplicationName("Diaz-Qt-test");
 
-    AppTests app_tests(app);
-    if (QTest::qExec(&app_tests) != 0) {
-        fInvalid = true;
-    }
+    SSL_library_init();
+
     URITests test1;
     if (QTest::qExec(&test1) != 0) {
         fInvalid = true;
     }
-#if defined(ENABLE_WALLET) && defined(ENABLE_BIP70)
+#ifdef ENABLE_WALLET
     PaymentServerTests test2;
     if (QTest::qExec(&test2) != 0) {
         fInvalid = true;
@@ -103,6 +98,8 @@ int main(int argc, char *argv[])
         fInvalid = true;
     }
 #endif
+
+    fs::remove_all(pathTemp);
 
     return fInvalid;
 }

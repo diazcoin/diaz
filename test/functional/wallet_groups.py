@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test wallet group functionality."""
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.messages import CTransaction, FromHex, ToHex
 from test_framework.util import (
     assert_equal,
@@ -16,12 +16,12 @@ def assert_approx(v, vexp, vspan=0.00001):
     if v > vexp + vspan:
         raise AssertionError("%s > [%s..%s]" % (str(v), str(vexp - vspan), str(vexp + vspan)))
 
-class WalletGroupTest(BitcoinTestFramework):
+class WalletGroupTest(DiazTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 3
         self.extra_args = [[], [], ['-avoidpartialspends']]
-        self.rpc_timeout = 120
+        self.rpc_timewait = 120
 
     def skip_test_if_missing_module(self):
         self.skip_if_no_wallet()

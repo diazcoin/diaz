@@ -1,10 +1,10 @@
-// Copyright (c) 2012-2019 The Bitcoin Core developers
+// Copyright (c) 2012-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <netbase.h>
-#include <test/setup_common.h>
-#include <util/strencodings.h>
+#include <test/test_diaz.h>
+#include <utilstrencodings.h>
 
 #include <string>
 
@@ -59,7 +59,6 @@ BOOST_AUTO_TEST_CASE(netbase_properties)
     BOOST_CHECK(ResolveIP("FC00::").IsRFC4193());
     BOOST_CHECK(ResolveIP("2001::2").IsRFC4380());
     BOOST_CHECK(ResolveIP("2001:10::").IsRFC4843());
-    BOOST_CHECK(ResolveIP("2001:20::").IsRFC7343());
     BOOST_CHECK(ResolveIP("FE80::").IsRFC4862());
     BOOST_CHECK(ResolveIP("64:FF9B::").IsRFC6052());
     BOOST_CHECK(ResolveIP("FD87:D87E:EB43:edb1:8e4:3588:e546:35ca").IsTor());
@@ -301,24 +300,6 @@ BOOST_AUTO_TEST_CASE(netbase_getgroup)
     // baz.net sha256 hash: 12929400eb4607c4ac075f087167e75286b179c693eb059a01774b864e8fe505
     std::vector<unsigned char> internal_group = {NET_INTERNAL, 0x12, 0x92, 0x94, 0x00, 0xeb, 0x46, 0x07, 0xc4, 0xac, 0x07};
     BOOST_CHECK(CreateInternal("baz.net").GetGroup() == internal_group);
-}
-
-BOOST_AUTO_TEST_CASE(netbase_parsenetwork)
-{
-    BOOST_CHECK_EQUAL(ParseNetwork("ipv4"), NET_IPV4);
-    BOOST_CHECK_EQUAL(ParseNetwork("ipv6"), NET_IPV6);
-    BOOST_CHECK_EQUAL(ParseNetwork("onion"), NET_ONION);
-    BOOST_CHECK_EQUAL(ParseNetwork("tor"), NET_ONION);
-
-    BOOST_CHECK_EQUAL(ParseNetwork("IPv4"), NET_IPV4);
-    BOOST_CHECK_EQUAL(ParseNetwork("IPv6"), NET_IPV6);
-    BOOST_CHECK_EQUAL(ParseNetwork("ONION"), NET_ONION);
-    BOOST_CHECK_EQUAL(ParseNetwork("TOR"), NET_ONION);
-
-    BOOST_CHECK_EQUAL(ParseNetwork(":)"), NET_UNROUTABLE);
-    BOOST_CHECK_EQUAL(ParseNetwork("tÖr"), NET_UNROUTABLE);
-    BOOST_CHECK_EQUAL(ParseNetwork("\xfe\xff"), NET_UNROUTABLE);
-    BOOST_CHECK_EQUAL(ParseNetwork(""), NET_UNROUTABLE);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

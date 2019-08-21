@@ -35,7 +35,7 @@ class TransactionView : public QWidget
     Q_OBJECT
 
 public:
-    explicit TransactionView(const PlatformStyle *platformStyle, QWidget *parent = nullptr);
+    explicit TransactionView(const PlatformStyle *platformStyle, QWidget *parent = 0);
 
     void setModel(WalletModel *model);
 
@@ -109,8 +109,6 @@ Q_SIGNALS:
 
     /**  Fired when a message should be reported to the user */
     void message(const QString &title, const QString &message, unsigned int style);
-
-    void bumpedFee(const uint256& txid);
 
 public Q_SLOTS:
     void chooseDate(int idx);

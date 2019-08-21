@@ -30,7 +30,7 @@ SOURCE_LANG = 'diaz_en.ts'
 LOCALE_DIR = 'src/qt/locale'
 # Minimum number of messages for translation to be considered at all
 MIN_NUM_MESSAGES = 10
-# Regexp to check for Diazcoin addresses
+# Regexp to check for Diaz addresses
 ADDRESS_REGEXP = re.compile('([13]|bc1)[a-zA-Z0-9]{30,}')
 
 def check_at_repository_root():
@@ -125,7 +125,7 @@ def escape_cdata(text):
     return text
 
 def contains_diaz_addr(text, errors):
-    if text is not None and ADDRESS_REGEXP.search(text) is not None:
+    if text != None and ADDRESS_REGEXP.search(text) != None:
         errors.append('Translation "%s" contains a diaz address. This will be removed.' % (text))
         return True
     return False

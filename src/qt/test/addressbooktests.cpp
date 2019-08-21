@@ -1,16 +1,19 @@
 #include <qt/test/addressbooktests.h>
 #include <qt/test/util.h>
-#include <test/setup_common.h>
+#include <test/test_diaz.h>
 
-#include <interfaces/chain.h>
 #include <interfaces/node.h>
+#include <qt/addressbookpage.h>
+#include <qt/addresstablemodel.h>
 #include <qt/editaddressdialog.h>
+#include <qt/callback.h>
 #include <qt/optionsmodel.h>
 #include <qt/platformstyle.h>
 #include <qt/qvalidatedlineedit.h>
 #include <qt/walletmodel.h>
 
 #include <key.h>
+#include <pubkey.h>
 #include <key_io.h>
 #include <wallet/wallet.h>
 
@@ -54,8 +57,7 @@ void EditAddressAndSubmit(
 void TestAddAddressesToSendBook()
 {
     TestChain100Setup test;
-    auto chain = interfaces::MakeChain();
-    std::shared_ptr<CWallet> wallet = std::make_shared<CWallet>(chain.get(), WalletLocation(), WalletDatabase::CreateMock());
+    std::shared_ptr<CWallet> wallet = std::make_shared<CWallet>(WalletLocation(), WalletDatabase::CreateMock());
     bool firstRun;
     wallet->LoadWallet(firstRun);
 
@@ -92,7 +94,6 @@ void TestAddAddressesToSendBook()
     }
 
     auto check_addbook_size = [&wallet](int expected_size) {
-        LOCK(wallet->cs_wallet);
         QCOMPARE(static_cast<int>(wallet->mapAddressBook.size()), expected_size);
     };
 

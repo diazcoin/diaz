@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2019 The Bitcoin Core developers
+// Copyright (c) 2011-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -31,14 +31,14 @@ class WalletFrame : public QFrame
     Q_OBJECT
 
 public:
-    explicit WalletFrame(const PlatformStyle *platformStyle, DiazGUI *_gui = nullptr);
+    explicit WalletFrame(const PlatformStyle *platformStyle, DiazGUI *_gui = 0);
     ~WalletFrame();
 
     void setClientModel(ClientModel *clientModel);
 
-    void addWallet(WalletModel *walletModel);
-    void setCurrentWallet(WalletModel* wallet_model);
-    void removeWallet(WalletModel* wallet_model);
+    bool addWallet(WalletModel *walletModel);
+    bool setCurrentWallet(const QString& name);
+    bool removeWallet(const QString &name);
     void removeAllWallets();
 
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
@@ -53,15 +53,14 @@ private:
     QStackedWidget *walletStack;
     DiazGUI *gui;
     ClientModel *clientModel;
-    QMap<WalletModel*, WalletView*> mapWalletViews;
+    QMap<QString, WalletView*> mapWalletViews;
 
     bool bOutOfSync;
 
     const PlatformStyle *platformStyle;
 
 public:
-    WalletView* currentWalletView() const;
-    WalletModel* currentWalletModel() const;
+    WalletView *currentWalletView();
 
 public Q_SLOTS:
     /** Switch to overview (home) page */
