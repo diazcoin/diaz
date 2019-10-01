@@ -14,7 +14,7 @@ out collectively by the network. Diaz Core is the name of open source
 software which enables the use of this currency.
 
 For more information, as well as an immediately useable, binary version of
-the Diaz Core software, see https://diazwallet.online/en/download/, or read the
+the Diaz Core software, see https://diazwallet.online/, or read the
 [original whitepaper](https://diazwallet/whitepaper/whitepaper.pdf).
 
 | Diaz | Description |
