@@ -1,0 +1,33 @@
+# /etc/conf.d/diazd: config file for /etc/init.d/diazd
+
+# Config file location
+#DIAZD_CONFIGFILE="/etc/diaz/diaz.conf"
+
+# What directory to write pidfile to?  (created and owned by $DIAZD_USER)
+#DIAZD_PIDDIR="/var/run/diazd"
+
+# What filename to give the pidfile
+#DIAZD_PIDFILE="${DIAZD_PIDDIR}/diazd.pid"
+
+# Where to write diazd data (be mindful that the blockchain is large)
+#DIAZD_DATADIR="/var/lib/diazd"
+
+# User and group to own diazd process
+#DIAZD_USER="diaz"
+#DIAZD_GROUP="diaz"
+
+# Path to diazd executable
+#DIAZD_BIN="/usr/bin/diazd"
+
+# Nice value to run diazd under
+#DIAZD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+#DIAZD_OPTS=""
+
+# The timeout in seconds OpenRC will wait for diazd to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+DIAZD_SIGTERM_TIMEOUT=600

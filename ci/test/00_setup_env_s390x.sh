@@ -12,4 +12,4 @@ export NO_DEPENDS=1
 export RUN_UNIT_TESTS=true
 export RUN_FUNCTIONAL_TESTS=true
 export GOAL="install"
-export BITCOIN_CONFIG="--enable-reduce-exports --with-incompatible-bdb"
+export DIAZ_CONFIG="--enable-reduce-exports --with-incompatible-bdb"

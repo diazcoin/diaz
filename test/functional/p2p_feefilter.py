@@ -9,7 +9,7 @@ import time
 
 from test_framework.messages import msg_feefilter
 from test_framework.mininode import mininode_lock, P2PInterface
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 
 
 def hashToHex(hash):
@@ -38,7 +38,7 @@ class TestP2PConn(P2PInterface):
         with mininode_lock:
             self.txinvs = []
 
-class FeeFilterTest(BitcoinTestFramework):
+class FeeFilterTest(DiazTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         # We lower the various required feerates for this test

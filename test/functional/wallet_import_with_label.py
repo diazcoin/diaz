@@ -10,14 +10,14 @@ with or without a label and then its private key is imported with importprivkey
 with and without a label.
 """
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.wallet_util import (
     labels_value,
     test_address,
 )
 
 
-class ImportWithLabel(BitcoinTestFramework):
+class ImportWithLabel(DiazTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.setup_clean_chain = True

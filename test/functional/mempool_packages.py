@@ -7,7 +7,7 @@
 from decimal import Decimal
 
 from test_framework.messages import COIN
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -20,7 +20,7 @@ MAX_DESCENDANTS = 25
 # custom limits for node1
 MAX_ANCESTORS_CUSTOM = 5
 
-class MempoolPackagesTest(BitcoinTestFramework):
+class MempoolPackagesTest(DiazTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.extra_args = [

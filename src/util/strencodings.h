@@ -6,8 +6,8 @@
 /**
  * Utilities for converting data from/to strings.
  */
-#ifndef BITCOIN_UTIL_STRENCODINGS_H
-#define BITCOIN_UTIL_STRENCODINGS_H
+#ifndef DIAZ_UTIL_STRENCODINGS_H
+#define DIAZ_UTIL_STRENCODINGS_H
 
 #include <attributes.h>
 
@@ -258,4 +258,4 @@ std::string ToUpper(const std::string& str);
  */
 std::string Capitalize(std::string str);
 
-#endif // BITCOIN_UTIL_STRENCODINGS_H
+#endif // DIAZ_UTIL_STRENCODINGS_H

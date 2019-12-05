@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_NODE_CONTEXT_H
-#define BITCOIN_NODE_CONTEXT_H
+#ifndef DIAZ_NODE_CONTEXT_H
+#define DIAZ_NODE_CONTEXT_H
 
 #include <memory>
 #include <vector>
@@ -42,4 +42,4 @@ struct NodeContext {
     ~NodeContext();
 };
 
-#endif // BITCOIN_NODE_CONTEXT_H
+#endif // DIAZ_NODE_CONTEXT_H

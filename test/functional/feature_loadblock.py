@@ -17,12 +17,12 @@ import tempfile
 import urllib
 
 from test_framework.test_framework import (
-    BitcoinTestFramework,
+    DiazTestFramework,
 )
 from test_framework.util import assert_equal, wait_until
 
 
-class LoadblockTest(BitcoinTestFramework):
+class LoadblockTest(DiazTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2

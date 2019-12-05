@@ -5,7 +5,7 @@
 """Test the listreceivedbyaddress RPC."""
 from decimal import Decimal
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import DiazTestFramework
 from test_framework.util import (
     assert_array_result,
     assert_equal,
@@ -17,7 +17,7 @@ from test_framework.wallet_util import (
 )
 
 
-class ReceivedByTest(BitcoinTestFramework):
+class ReceivedByTest(DiazTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
 
