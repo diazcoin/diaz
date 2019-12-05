@@ -77,7 +77,7 @@ public:
         consensus.BIP65Height = 10; 
         consensus.BIP66Height = 15; 
         consensus.CSVHeight = 70000; 
-        consensus.SegwitHeight = 481824; 
+        consensus.SegwitHeight = 8643; 
         consensus.MinBIP9WarningHeight = 65000; // segwit activation height + miner confirmation window
         consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 2 * 24 * 60 * 60; // two weeks
