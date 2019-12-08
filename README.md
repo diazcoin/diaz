@@ -1,8 +1,7 @@
 Diaz Core integration/staging tree
 =====================================
 
-https://diazcore.org
-
+https://diazwallet.online
 What is Diaz?
 ----------------
 
@@ -13,8 +12,8 @@ out collectively by the network. Diaz Core is the name of open source
 software which enables the use of this currency.
 
 For more information, as well as an immediately usable, binary version of
-the Diaz Core software, see https://diazcore.org/en/download/, or read the
-[original whitepaper](https://diazcore.org/diaz.pdf).
+the Diaz Core software, see https://diazwallet.online/en/download/, or read the
+[original whitepaper](https://diazwallet.online/diaz.pdf).
 
 License
 -------
